@@ -80,11 +80,11 @@ export default ({ data: bills, loading, error }) => {
   )
 }
 
-// [Bug report] - Bills sorting
-// Sorting function implemented
+// [Bug report] - Bills not sorted
+// Fix : Implementing sorting fn
 function dateDescSorting(bills){
 
-  if (bills && bills.length) {
+  if (bills && bills.length) { // to avoid test failure when one of the test send an empty array as bills
     const billsClone = [...bills]    
     billsClone.sort((a, b) => { return new Date(b.date) - new Date(a.date); })
     return billsClone
