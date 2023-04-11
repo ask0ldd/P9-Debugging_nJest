@@ -73,8 +73,8 @@ export default class {
     this.onNavigate = onNavigate
     this.store = store
     $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
-    $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
-    $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
+    $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2)) // [Bug Hunt] - Dashboard tickets : triggered by open tickets lists arrow
+    $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3)) // same
     new Logout({ localStorage, onNavigate })
   }
 
@@ -146,7 +146,10 @@ export default class {
     }
 
     bills.forEach(bill => {
+      // [Bug Hunt] - Dashboard tickets : triggered by open tickets lists arrow
+      // add a new click event to all visible tickets even if they already have one
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+      //
     })
 
     return bills
