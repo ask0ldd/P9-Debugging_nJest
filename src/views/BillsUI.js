@@ -69,7 +69,8 @@ export default ({ data: bills, loading, error }) => {
               </tr>
           </thead>
           <tbody data-testid="tbody">
-            ${rows(bills)}
+            ${console.log('step1', bills)}
+            ${rows(dateDescSorting(bills))}
           </tbody>
           </table>
         </div>
@@ -77,4 +78,17 @@ export default ({ data: bills, loading, error }) => {
       ${modal()}
     </div>`
   )
+}
+
+// [Bug report] - Bills sorting
+// Sorting function implemented
+function dateDescSorting(bills){
+
+  if (bills && bills.length) {
+    const billsClone = [...bills]    
+    billsClone.sort((a, b) => { return new Date(b.date) - new Date(a.date); })
+    return billsClone
+  }
+
+  return bills
 }
