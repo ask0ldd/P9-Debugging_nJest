@@ -10,7 +10,7 @@ import Bills from "../containers/Bills.js";
 import { bills } from "../fixtures/bills.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
-import { store as mockedStore } from "../__mocks__/store.js";
+import store from "../__mocks__/store.js";
 
 import router from "../app/Router.js";
 
@@ -54,7 +54,7 @@ describe("Given I am connected as an employee", () => {
         expect(dates).toEqual(datesSorted)
     })
     
-    // * UNIT TEST / new bill button click / employee dashboard / container/bill.js coverage line 11
+    // * UNIT TEST / new bill button click / UI : employee dashboard / container/bill.js coverage line 11
     test("then clicking on the new bill button should display the new bill form", async () => { // async to be able to use await waitfor
         // onNavigate is a fn passed to every containers
         // so that they can force programmatically the navigation to other pages
@@ -62,45 +62,41 @@ describe("Given I am connected as an employee", () => {
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({ pathname })
         }
-
         Object.defineProperty(window, 'localStorage', { value: localStorageMock })
         window.localStorage.setItem('user', JSON.stringify({
           type: 'Employee'
         }))
-
         // we need to instanciate the bill container to accces its methods for our test
         const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
-
         document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
         const handleClickNewBillMockFn = jest.fn((e) => billContainer.handleClickNewBill())
-        // bodytoTestFile()
         await waitFor(() => screen.getByTestId('btn-new-bill'))
+
         const newBillBtn = screen.getByTestId('btn-new-bill')
         newBillBtn.addEventListener('click', handleClickNewBillMockFn)
         userEvent.click(newBillBtn)
+        
+        // unit test ?
         expect(handleClickNewBillMockFn).toHaveBeenCalled()
 
-        // should be an integration test?
+        // integration test?
         await waitFor(() => screen.getByTestId('form-new-bill'))
         expect(screen.getByTestId("form-new-bill")).toBeInTheDocument()
 
     })
 
-    // * UNIT TEST / icon eye button click / employee dashboard / container/bill.js coverage line 23
+    // * UNIT TEST / icon eye button click / UI : employee dashboard / container/bill.js coverage line 23
     test("then clicking on the icon eye button should open a modale", async () => { 
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({ pathname })
         }
-
         Object.defineProperty(window, 'localStorage', { value: localStorageMock })
         window.localStorage.setItem('user', JSON.stringify({
           type: 'Employee'
         }))
-
         const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
-
         document.body.innerHTML = BillsUI({ data: bills })
-        // bodytoTestFile()
+        
         await waitFor(() => screen.getAllByTestId('icon-eye'))
         // select the first eye icon
         const iconEyeBtn = screen.getAllByTestId('icon-eye')[0]
@@ -108,28 +104,31 @@ describe("Given I am connected as an employee", () => {
         iconEyeBtn.addEventListener('click', handleClickIconEyeMockFn)
         $.fn.modal = jest.fn() // mock bootstrap modale fn to avoid any error
         userEvent.click(iconEyeBtn)
+
         expect(handleClickIconEyeMockFn).toHaveBeenCalled()
         expect($.fn.modal).toHaveBeenCalledWith('show') 
     })
 
-    // * UNIT TEST / we need to test the getbill() fn of the bill container / employee dashboard / container/bill.js coverage line 30
+    // * UNIT TEST / we need to test the getbill() fn of the bill container / UI : employee dashboard / container/bill.js coverage line 30
     // function ccalled into app/router.js
-    test("then passing a mocked store containing 4 bills should lead to 4 bills being displayed into the BillUI", async () => { 
+    test("then passing a mocked store containing 4 bills should lead to 4 bills being displayed", async () => { 
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
-
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
       }))
+      const mockedStore = store
+      const billContainer = new Bills({ document, onNavigate, store: mockedStore, localStorage: window.localStorage }) // passing the mocked store instead of bills
 
-      const billContainer = new Bills({ document, onNavigate, store: mockedStore, localStorage: window.localStorage }) // passing the mocked store
+      // unit test ?
+      expect((await billContainer.getBills()).length).toBe(4)
 
-      document.body.innerHTML = BillsUI(billContainer.getBills())
-
-      bodytoTestFile()
-
+      document.body.innerHTML = BillsUI({data : await billContainer.getBills()}) // passed as data
+      // integration test ?
+      await waitFor(() => screen.getAllByTestId('icon-eye'))
+      expect(screen.getAllByTestId('icon-eye').length).toBe(4)
     })
 
 
