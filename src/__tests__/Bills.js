@@ -3,6 +3,7 @@
  */
 
 import {screen, waitFor} from "@testing-library/dom"
+import '@testing-library/jest-dom' // .toBeInTheDocument() matcher
 import userEvent from '@testing-library/user-event'
 import BillsUI from "../views/BillsUI.js"
 import Bills from "../containers/Bills.js";
@@ -51,11 +52,11 @@ describe("Given I am connected as an employee", () => {
       expect(dates).toEqual(datesSorted)
     })
     
-    // UNIT TEST / new bill button / employ dashboard / container/bill.js coverage line 11
+    // UNIT TEST / new bill button click / employ dashboard / container/bill.js coverage line 11
     test("then clicking on the new bill button should display the new bill form", async () => { // async
-      // we need access to the Bill container methods for our test
-      // this onNavigate fn is passed to every containers
-      // so they can force programmatically the navigation to other pages
+      // onNavigate is a fn passed to every containers
+      // so that they can force programmatically the navigation to other pages
+      // the version below is simplified : only updating the documents body
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
@@ -65,12 +66,11 @@ describe("Given I am connected as an employee", () => {
         type: 'Employee'
       }))
 
-      const dashboard = new Bills({
-        document, onNavigate, store: null, bills:bills, localStorage: window.localStorage
-      })
+      // we need to instanciate the bill container to accces its methods for our test
+      const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
 
-      document.body.innerHTML = BillsUI({ data: { bills } })
-      const handleClickNewBillMockFn = jest.fn((e) => dashboard.handleClickNewBill())
+      document.body.innerHTML = BillsUI({ data: { bills } }) // bills out of fixtures/bill.js
+      const handleClickNewBillMockFn = jest.fn((e) => billContainer.handleClickNewBill())
       // bodytoTestFile()
       await waitFor(() => screen.getByTestId('btn-new-bill'))
       const newBillBtn = screen.getByTestId('btn-new-bill')
