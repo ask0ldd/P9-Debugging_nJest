@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { screen } from "@testing-library/dom"
+import { screen, waitFor } from "@testing-library/dom"
 import '@testing-library/jest-dom' // .toBeInTheDocument() matcher
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
@@ -13,7 +13,8 @@ import router from "../app/Router.js";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
-    test("Then the new bill page and its form should be displayed", () => {
+    // * UNIT TEST / when connected as an  / UI : employee dashboard / container/bill.js coverage line 30
+    test("Then the page and its form should be displayed", () => {
         Object.defineProperty(window, 'localStorage', { value: localStorageMock })
         window.localStorage.setItem('user', JSON.stringify({
           type: 'Employee'
@@ -44,5 +45,26 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getByTestId('file')).toBeInTheDocument()
         expect(document.body.querySelector('#btn-send-bill')).toBeInTheDocument()
     })
+
+    test("Then the mail icon should be highlighted", async () => {
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      // rooter() render all the views into a root div by default
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
+      router()
+      // pushing NewBillUI into the vDOM
+      window.onNavigate(ROUTES_PATH.NewBill)
+      await waitFor(() => screen.getByTestId('icon-mail'))
+      const mailIcon = screen.getByTestId('icon-mail')
+      expect(mailIcon.classList.contains("active-icon")).toBeTruthy()
+  })
+
+
+
   })
 })
