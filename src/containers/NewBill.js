@@ -64,6 +64,13 @@ export default class NewBill {
       fileName: this.fileName,
       status: 'pending'
     }
+    // [Bug Hunt] - Bills
+    // extension not checked --- needs some improvements
+    const ext = fileName.split('.')[1]
+    if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
+      throw new Error("Type de fichier invalide.")
+    }
+    //
     this.updateBill(bill)
     this.onNavigate(ROUTES_PATH['Bills'])
   }
