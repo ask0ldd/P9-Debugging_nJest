@@ -128,10 +128,10 @@ describe("Given I am connected as an employee", () => {
         document.body.innerHTML = BillsUI({data : await billContainer.getBills()}) // passed as data
         // integration test ?
         await waitFor(() => screen.getAllByTestId('icon-eye'))
-        expect(screen.getByText('encore')).toBeTruthy() // 4 bills in the mocked store, 4 expected names & 4 icon eyes into the bills table
-        expect(screen.getByText('test1')).toBeTruthy()
-        expect(screen.getByText('test2')).toBeTruthy()
-        expect(screen.getByText('test3')).toBeTruthy()
+        expect(screen.getByText('encore')).toBeInTheDocument() // 4 bills in the mocked store, 4 expected names & 4 icon eyes into the bills table
+        expect(screen.getByText('test1')).toBeInTheDocument()
+        expect(screen.getByText('test2')).toBeInTheDocument()
+        expect(screen.getByText('test3')).toBeInTheDocument()
         expect(screen.getAllByTestId('icon-eye').length).toBe(4)
     })
 
@@ -156,7 +156,7 @@ describe("Given I am connected as an employee", () => {
             "commentary": "séminaire billed",
             "name": "encore",
             "fileName": "preview-facture-free-201801-pdf-1.jpg",
-            "date": "xxxx/xx/xx", // invalid date
+            "date": "xxxx/xx/xx", // invalid date inserted
             "amount": 400,
             "commentAdmin": "ok",
             "email": "a@a",
@@ -177,7 +177,7 @@ describe("Given I am connected as an employee", () => {
       // integration test
       document.body.innerHTML = BillsUI({data : await billContainer.getBills()})
       await waitFor(() => screen.getAllByTestId('icon-eye'))
-      expect(screen.getByText('xxxx/xx/xx')).toBeTruthy()
+      expect(screen.getByText('xxxx/xx/xx')).toBeInTheDocument()
     })
 
   })
