@@ -148,8 +148,13 @@ export default class {
     bills.forEach(bill => {
       // [Bug Hunt] - Dashboard tickets : triggered by open tickets lists arrow
       // add a new click event to all visible tickets even if they already have one
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+      // $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
       //
+      // Correction :
+      // this.index = 1 | 2 | 3 and 1 means pending, 2 accepted, 3 refused
+      // getStatus convert this index into pending / accepted / refused
+      // bills has a status property to check
+      if(bill.status === getStatus(this.index)) $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })
 
     return bills

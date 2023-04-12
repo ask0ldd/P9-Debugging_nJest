@@ -69,7 +69,6 @@ export default ({ data: bills, loading, error }) => {
               </tr>
           </thead>
           <tbody data-testid="tbody">
-            ${console.log('step1', bills)}
             ${rows(dateDescSorting(bills))}
           </tbody>
           </table>
