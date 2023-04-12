@@ -174,8 +174,10 @@ describe("Given I am connected as an employee", () => {
       // unit test ?
       expect((await billContainer.getBills())[0].date).toBe('xxxx/xx/xx')
       
-      
-    
+      // integration test
+      document.body.innerHTML = BillsUI({data : await billContainer.getBills()})
+      await waitFor(() => screen.getAllByTestId('icon-eye'))
+      expect(screen.getByText('xxxx/xx/xx')).toBeTruthy()
     })
 
   })
