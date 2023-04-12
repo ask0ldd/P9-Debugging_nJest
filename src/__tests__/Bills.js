@@ -75,7 +75,7 @@ describe("Given I am connected as an employee", () => {
         const newBillBtn = screen.getByTestId('btn-new-bill')
         newBillBtn.addEventListener('click', handleClickNewBillMockFn)
         userEvent.click(newBillBtn)
-        
+
         // unit test ?
         expect(handleClickNewBillMockFn).toHaveBeenCalled()
 
@@ -110,8 +110,33 @@ describe("Given I am connected as an employee", () => {
     })
 
     // * UNIT TEST / we need to test the getbill() fn of the bill container / UI : employee dashboard / container/bill.js coverage line 30
-    // function ccalled into app/router.js
+    // function called into app/router.js
     test("then passing a mocked store containing 4 bills should lead to 4 bills being displayed", async () => { 
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname })
+        }
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee'
+        }))
+        const mockedStore = store
+        const billContainer = new Bills({ document, onNavigate, store: mockedStore, localStorage: window.localStorage }) // passing the mocked store instead of bills
+
+        // unit test ?
+        expect((await billContainer.getBills()).length).toBe(4) // 4 bills in the mocked store, 4 bills out of getbills
+
+        document.body.innerHTML = BillsUI({data : await billContainer.getBills()}) // passed as data
+        // integration test ?
+        await waitFor(() => screen.getAllByTestId('icon-eye'))
+        expect(screen.getByText('encore')).toBeTruthy() // 4 bills in the mocked store, 4 expected names & 4 icon eyes into the bills table
+        expect(screen.getByText('test1')).toBeTruthy()
+        expect(screen.getByText('test2')).toBeTruthy()
+        expect(screen.getByText('test3')).toBeTruthy()
+        expect(screen.getAllByTestId('icon-eye').length).toBe(4)
+    })
+
+    // * UNIT TEST / we need to test how the bill container handle an invalid date / UI : employee dashboard / container/bill.js coverage line 30
+    test("then passing a mocked store containing one invalid date should lead to an invalid date being displayed into the bills table", async () => { 
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
@@ -119,18 +144,39 @@ describe("Given I am connected as an employee", () => {
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
       }))
-      const mockedStore = store
+
+      const mockedBill = {
+        list() {
+          return Promise.resolve([{
+            "id": "47qAXb6fIm2zOKkLzMro",
+            "vat": "80",
+            "fileUrl": "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
+            "status": "pending",
+            "type": "Hôtel et logement",
+            "commentary": "séminaire billed",
+            "name": "encore",
+            "fileName": "preview-facture-free-201801-pdf-1.jpg",
+            "date": "xxxx/xx/xx", // invalid date
+            "amount": 400,
+            "commentAdmin": "ok",
+            "email": "a@a",
+            "pct": 20
+          }])}
+      }
+
+      const mockedStore = {
+        bills() {
+        return mockedBill
+      },}
+
       const billContainer = new Bills({ document, onNavigate, store: mockedStore, localStorage: window.localStorage }) // passing the mocked store instead of bills
 
       // unit test ?
-      expect((await billContainer.getBills()).length).toBe(4)
-
-      document.body.innerHTML = BillsUI({data : await billContainer.getBills()}) // passed as data
-      // integration test ?
-      await waitFor(() => screen.getAllByTestId('icon-eye'))
-      expect(screen.getAllByTestId('icon-eye').length).toBe(4)
+      expect((await billContainer.getBills())[0].date).toBe('xxxx/xx/xx')
+      
+      
+    
     })
-
 
   })
 })
