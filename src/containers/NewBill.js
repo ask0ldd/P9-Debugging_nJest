@@ -22,6 +22,7 @@ export default class NewBill {
     const fileName = filePath[filePath.length-1]
     // [Bug Hunt] - Bills
     // extension not checked --- needs some improvements
+    // correction / ajout :
     const ext = fileName.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
       throw new Error("Type de fichier invalide.")
@@ -66,6 +67,7 @@ export default class NewBill {
     }
     // [Bug Hunt] - Bills
     // extension not checked --- needs some improvements
+    // correction / ajout :
     const ext = fileName.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
       throw new Error("Type de fichier invalide.")
