@@ -52,7 +52,7 @@ describe("Given I am connected as an employee", () => {
       expect(dates).toEqual(datesSorted)
     })
     
-    // UNIT TEST / new bill button click / employ dashboard / container/bill.js coverage line 11
+    // UNIT TEST / new bill button click / employee dashboard / container/bill.js coverage line 11
     test("then clicking on the new bill button should display the new bill form", async () => { // async
       // onNavigate is a fn passed to every containers
       // so that they can force programmatically the navigation to other pages
@@ -78,9 +78,36 @@ describe("Given I am connected as an employee", () => {
       userEvent.click(newBillBtn)
       expect(handleClickNewBillMockFn).toHaveBeenCalled()
 
+      // should be an integration test?
       await waitFor(() => screen.getByTestId('form-new-bill'))
-      expect(screen.getByTestId("form-new-bill")).toBeInTheDocument() // installed '@testing-library/jest-dom' to access .toBeInTheDocument() matcher
+      expect(screen.getByTestId("form-new-bill")).toBeInTheDocument()
 
     })
+
+    // UNIT TEST / icon eye button click / employee dashboard / container/bill.js coverage line 23
+    test("then clicking on the icon eye button should open a modale", async () => { // async
+
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+
+      const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
+
+      document.body.innerHTML = BillsUI({ data: { bills } })
+      // bodytoTestFile()
+      await waitFor(() => screen.getByTestId('icon-eye'))
+      const iconEyeButtons = screen.getByTestId('icon-eye')
+      const handleClickIconEyeMockFn = jest.fn((e) => billContainer.handleClickIconEye(iconEyeButtons[0]))
+      iconEyeButtons[0].addEventListener('click', handleClickIconEyeMockFn)
+      userEvent.click(iconEyeButtons[0])
+      expect(handleClickIconEyeMockFn).toHaveBeenCalled()
+    })
+
+
   })
 })
