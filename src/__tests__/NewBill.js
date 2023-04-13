@@ -84,11 +84,11 @@ describe("Given I am connected as an employee", () => {
       userEvent.upload(fileInput, file)
       expect(changeFileMockedFn).toHaveBeenCalled()
       await waitFor(() => newBillContainer.billId==='1234')
+      // those value are returned by the mockedstore when handlechangefile is successful
+      // mocked store : create(bill) { return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'}) },
       expect(newBillContainer.billId).toBe('1234')
       expect(newBillContainer.fileUrl).toBe('https://localhost:3456/images/test.jpg')
       // expect(newBillContainer.fileName).toBe('test.jpg')
-      // check those values returned when mocked store succeed in creating a new entry. 
-      // three values being from : create(bill) { return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'}) },
     })
 
     /*test("Then change file > error ext", async () => { // !!! better description

@@ -19,6 +19,34 @@ const bodytoTestFile = () => {
   fs.writeFile('../test.txt', document.body.innerHTML, err => { if (err) { console.error(err) } })
 }
 
+let billContainer
+
+function InitBillviaOnNavigate() {
+  Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+  window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+  // rooter render all the views into a root div by default
+  const root = document.createElement("div")
+  root.setAttribute("id", "root")
+  document.body.append(root)
+  // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
+  router()
+  // pushing billsUI into the vDOM
+  window.onNavigate(ROUTES_PATH.Bills)
+}
+
+function InitWithABillInstance() { 
+  // onNavigate is a fn passed to every containers
+  // so that they can force programmatically the navigation to other pages
+  // the version below is simplified : only updating the documents body
+  const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
+  Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+  window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+  // we need to instanciate the bill container to accces its methods for our test
+  billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
+  document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
+}
+
+
 describe("Given I am connected as an employee", () => {
 
   describe("When I am on the Bills Page", () => {
