@@ -46,23 +46,24 @@ describe("Given I am connected as an employee", () => {
         expect(document.body.querySelector('#btn-send-bill')).toBeInTheDocument()
     })
 
-    test("Then the mail icon should be highlighted", async () => {
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Employee'
-      }))
-      // rooter() render all the views into a root div by default
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.append(root)
-      // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
-      router()
-      // pushing NewBillUI into the vDOM
-      window.onNavigate(ROUTES_PATH.NewBill)
-      await waitFor(() => screen.getByTestId('icon-mail'))
-      const mailIcon = screen.getByTestId('icon-mail')
-      expect(mailIcon.classList.contains("active-icon")).toBeTruthy()
-  })
+    test("Then the mail icon in the vertical layout should be the only one highlighted", async () => {
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee'
+        }))
+        // rooter() render all the views into a root div by default
+        const root = document.createElement("div")
+        root.setAttribute("id", "root")
+        document.body.append(root)
+        // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
+        router()
+        // pushing NewBillUI into the vDOM
+        window.onNavigate(ROUTES_PATH.NewBill)
+        await waitFor(() => screen.getByTestId('icon-mail'))
+        const mailIcon = screen.getByTestId('icon-mail')
+        expect(mailIcon.classList.contains("active-icon")).toBeTruthy()
+        expect(screen.getByTestId('icon-window').classList.contains("active-icon")).toBeFalsy()
+    })
 
 
 

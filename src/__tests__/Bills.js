@@ -23,7 +23,7 @@ describe("Given I am connected as an employee", () => {
 
   describe("When I am on the Bills Page", () => {
 
-    test("Then the bill icon, part of the vertical menu, should be highlighted", async () => {
+    test("Then the window icon in the vertical layout should be the only one highlighted", async () => {
 
         Object.defineProperty(window, 'localStorage', { value: localStorageMock })
         window.localStorage.setItem('user', JSON.stringify({
@@ -43,6 +43,7 @@ describe("Given I am connected as an employee", () => {
         // * unit test 1 
         // * solution :
         expect(windowIcon.classList.contains("active-icon")).toBeTruthy()
+        expect(screen.getByTestId('icon-mail').classList.contains("active-icon")).toBeFalsy()
         //
     })
 
