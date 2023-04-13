@@ -68,7 +68,7 @@ export default class NewBill {
     // [Bug Hunt] - Bills
     // extension not checked --- needs some improvements
     // correction / ajout :
-    const ext = fileName.split('.')[1]
+    const ext = bill.fileName.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
       throw new Error("Type de fichier invalide.")
     }

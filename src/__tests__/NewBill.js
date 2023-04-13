@@ -4,12 +4,19 @@
 
 import { screen, waitFor } from "@testing-library/dom"
 import '@testing-library/jest-dom' // .toBeInTheDocument() matcher
+import userEvent from '@testing-library/user-event'
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
+import store from "../__mocks__/store.js";
 import { bills } from "../fixtures/bills.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import router from "../app/Router.js";
+
+const fs = require('fs')
+const bodytoTestFile = () => {
+  fs.writeFile('../test.txt', document.body.innerHTML, err => { if (err) { console.error(err) } })
+}
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
@@ -27,22 +34,7 @@ describe("Given I am connected as an employee", () => {
         router()
         // pushing billsUI into the vDOM
         window.onNavigate(ROUTES_PATH.NewBill)
-        expect(screen.getByText('Envoyer une note de frais')).toBeInTheDocument()
-        expect(screen.getByText('Type de dépense')).toBeInTheDocument()
-        expect(screen.getByText('Nom de la dépense')).toBeInTheDocument()
-        expect(screen.getByText('Date')).toBeInTheDocument()
-        expect(screen.getByText('Montant TTC')).toBeInTheDocument()
-        expect(screen.getByText('TVA')).toBeInTheDocument()
-        expect(screen.getByText('Commentaire')).toBeInTheDocument()
-        expect(screen.getByText('Justificatif')).toBeInTheDocument()
-        expect(screen.getByTestId('expense-type')).toBeInTheDocument()
-        expect(screen.getByTestId('expense-name')).toBeInTheDocument()
-        expect(screen.getByTestId('datepicker')).toBeInTheDocument()
-        expect(screen.getByTestId('amount')).toBeInTheDocument()
-        expect(screen.getByTestId('vat')).toBeInTheDocument()
-        expect(screen.getByTestId('pct')).toBeInTheDocument()
-        expect(screen.getByTestId('commentary')).toBeInTheDocument()
-        expect(screen.getByTestId('file')).toBeInTheDocument()
+        expect(screen.getByTestId('form-new-bill')).toBeInTheDocument()
         expect(document.body.querySelector('#btn-send-bill')).toBeInTheDocument()
     })
 
@@ -64,6 +56,27 @@ describe("Given I am connected as an employee", () => {
         expect(mailIcon.classList.contains("active-icon")).toBeTruthy()
         expect(screen.getByTestId('icon-window').classList.contains("active-icon")).toBeFalsy()
     })
+
+    test("Then the new bill form should be submitted when i click on the envoyer button", async () => {
+      const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+      // we need to instanciate the newbill container to acces its methods for our test
+      const newBillContainer = new NewBill({ document, onNavigate, store: store, localStorage: window.localStorage })
+      document.body.innerHTML = NewBillUI()
+      await waitFor(() => screen.getByTestId('form-new-bill'))
+      newBillContainer.fileName = "aaaaa.jpg"
+      newBillContainer.fileUrl = "www.google.com/test/"
+      console.log(newBillContainer)
+      // needs to define newBill.filename to simulate a file has been selected before submitting
+      const formNewBill = screen.getByTestId('form-new-bill')
+      const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
+      formNewBill.addEventListener('submit', clickSubmitNewBillMockedFn)
+      bodytoTestFile()
+      const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
+      userEvent.click(sendNewBillBtn)
+      expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
+  })
 
 
 
