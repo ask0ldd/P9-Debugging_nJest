@@ -21,9 +21,9 @@ export default class NewBill {
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
     // [Bug Hunt] - Bills
-    // extension not checked --- needs some improvements
+    // extension not checked --- needs some improvements MIME TYPES
     // correction / ajout :
-    const ext = fileName.split('.')[1]
+    const ext = file.name.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
       throw new Error("Type de fichier invalide.")
     }
