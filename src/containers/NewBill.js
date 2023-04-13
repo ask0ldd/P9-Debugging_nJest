@@ -66,7 +66,7 @@ export default class NewBill {
       status: 'pending'
     }
     // [Bug Hunt] - Bills
-    // extension not checked --- needs some improvements
+    // extension not checked --- needs some improvements MIME TYPES
     // correction / ajout :
     const ext = bill.fileName.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {

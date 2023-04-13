@@ -19,53 +19,63 @@ const bodytoTestFile = () => {
   fs.writeFile('../test.txt', document.body.innerHTML, err => { if (err) { console.error(err) } })
 }
 
+let newBillContainer
+
+function InitNewBillviaOnNavigate() {
+  Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+  window.localStorage.setItem('user', JSON.stringify({
+    type: 'Employee'
+  }))
+  // rooter() render all the views into a root div by default
+  const root = document.createElement("div")
+  root.setAttribute("id", "root")
+  document.body.append(root)
+  // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
+  router()
+  // pushing billsUI into the vDOM
+  window.onNavigate(ROUTES_PATH.NewBill)  
+}
+
+// init page + instanciate newbill container to let all the tests access its methods
+function InitWithANewBillInstance() { 
+  const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
+  Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+  window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+  newBillContainer = new NewBill({ document, onNavigate, store: store, localStorage: window.localStorage })
+  document.body.innerHTML = NewBillUI()
+}
+
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
     /*beforeEach(() => console.log('localStorage', localStorageMock))*/
+    beforeAll(() => {
+      return InitNewBillviaOnNavigate()
+    })
+
     // * UNIT TEST / when connected as an  / UI : employee dashboard / container/bill.js coverage line 30
     test("Then the page and its form should be displayed", () => {
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee'
-        }))
-        // rooter() render all the views into a root div by default
-        const root = document.createElement("div")
-        root.setAttribute("id", "root")
-        document.body.append(root)
-        // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
-        router()
-        // pushing billsUI into the vDOM
-        window.onNavigate(ROUTES_PATH.NewBill)
         expect(screen.getByTestId('form-new-bill')).toBeInTheDocument()
         expect(document.body.querySelector('#btn-send-bill')).toBeInTheDocument()
     })
 
     test("Then the mail icon in the vertical layout should be the only one highlighted", async () => {
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee'
-        }))
-        // rooter() render all the views into a root div by default
-        const root = document.createElement("div")
-        root.setAttribute("id", "root")
-        document.body.append(root)
-        // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
-        router()
-        // pushing NewBillUI into the vDOM
-        window.onNavigate(ROUTES_PATH.NewBill)
         await waitFor(() => screen.getByTestId('icon-mail'))
         const mailIcon = screen.getByTestId('icon-mail')
         expect(mailIcon.classList.contains("active-icon")).toBeTruthy()
         expect(screen.getByTestId('icon-window').classList.contains("active-icon")).toBeFalsy()
     })
+  })
+})
+
+describe("Given I am connected as an employee", () => {
+  describe("When I am on NewBill Page", () => {
+
+    beforeEach(()=>{
+      return InitWithANewBillInstance() 
+    })
 
     test("Then change file", async () => { // !!! better description
-      const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-      const newBillContainer = new NewBill({ document, onNavigate, store: store, localStorage: window.localStorage })
-      document.body.innerHTML = NewBillUI()
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
@@ -73,10 +83,12 @@ describe("Given I am connected as an employee", () => {
       const file = new File(['test'], 'test.jpg', {type: 'image/jpg'}) // content name type
       userEvent.upload(fileInput, file)
       expect(changeFileMockedFn).toHaveBeenCalled()
-      // await ? newBillContainer.billId = key
-      // this.fileUrl = fileUrl
-      // this.fileName = fileName
-      // check those. three values being from : create(bill) { return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'}) },
+      await waitFor(() => newBillContainer.billId==='1234')
+      expect(newBillContainer.billId).toBe('1234')
+      expect(newBillContainer.fileUrl).toBe('https://localhost:3456/images/test.jpg')
+      // expect(newBillContainer.fileName).toBe('test.jpg')
+      // check those values returned when mocked store succeed in creating a new entry. 
+      // three values being from : create(bill) { return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'}) },
     })
 
     /*test("Then change file > error ext", async () => { // !!! better description
@@ -96,12 +108,6 @@ describe("Given I am connected as an employee", () => {
     })*/
 
     test("Then the new bill form should be submitted when i click on the envoyer button", async () => {
-        const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-        // we need to instanciate the newbill container to acces its methods for our test
-        const newBillContainer = new NewBill({ document, onNavigate, store: store, localStorage: window.localStorage })
-        document.body.innerHTML = NewBillUI()
         await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.jpg"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"
