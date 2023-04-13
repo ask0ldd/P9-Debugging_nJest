@@ -58,25 +58,25 @@ describe("Given I am connected as an employee", () => {
     })
 
     test("Then the new bill form should be submitted when i click on the envoyer button", async () => {
-      const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-      // we need to instanciate the newbill container to acces its methods for our test
-      const newBillContainer = new NewBill({ document, onNavigate, store: store, localStorage: window.localStorage })
-      document.body.innerHTML = NewBillUI()
-      await waitFor(() => screen.getByTestId('form-new-bill'))
-      newBillContainer.fileName = "aaaaa.jpg"
-      newBillContainer.fileUrl = "www.google.com/test/"
-      console.log(newBillContainer)
-      // needs to define newBill.filename to simulate a file has been selected before submitting
-      const formNewBill = screen.getByTestId('form-new-bill')
-      const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
-      formNewBill.addEventListener('submit', clickSubmitNewBillMockedFn)
-      bodytoTestFile()
-      const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
-      userEvent.click(sendNewBillBtn)
-      expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
-  })
+        const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+        // we need to instanciate the newbill container to acces its methods for our test
+        const newBillContainer = new NewBill({ document, onNavigate, store: store, localStorage: window.localStorage })
+        document.body.innerHTML = NewBillUI()
+        await waitFor(() => screen.getByTestId('form-new-bill'))
+        newBillContainer.fileName = "aaaaa.jpg"
+        newBillContainer.fileUrl = "www.google.com/test/"
+        console.log(newBillContainer)
+        // needs to define newBill.filename to simulate a file has been selected before submitting
+        const formNewBill = screen.getByTestId('form-new-bill')
+        const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
+        formNewBill.addEventListener('submit', clickSubmitNewBillMockedFn)
+        bodytoTestFile()
+        const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
+        userEvent.click(sendNewBillBtn)
+        expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
+    })
 
 
 
