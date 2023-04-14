@@ -16,16 +16,20 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate })
   }
   handleChangeFile = e => {
+    console.log(e)
     e.preventDefault()
-    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+    // const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+    const file = e.target.files[0]
+    console.log(e.target)
     const filePath = e.target.value.split(/\\/g)
+    console.log(filePath)
     const fileName = filePath[filePath.length-1]
     // [Bug Hunt] - Bills
     // extension not checked --- needs some improvements MIME TYPES
     // correction / ajout :
     const ext = file.name.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
-      throw new Error("Type de fichier invalide.")
+      // throw new Error("Type de fichier invalide.")
     }
     //
     const formData = new FormData()
