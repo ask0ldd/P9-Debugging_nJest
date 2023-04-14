@@ -5,7 +5,6 @@
 import { screen, waitFor } from "@testing-library/dom"
 import '@testing-library/jest-dom' // .toBeInTheDocument() matcher
 import userEvent from '@testing-library/user-event'
-import { fireEvent } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
@@ -19,31 +18,32 @@ const bodytoTestFile = () => {
   fs.writeFile('../test.txt', document.body.innerHTML, err => { if (err) { console.error(err) } })
 }
 
-let newBillContainer
-
 function InitNewBillviaOnNavigate() {
-  document.body.innerHTML = ""
-  Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-  window.localStorage.setItem('user', JSON.stringify({
-    type: 'Employee'
-  }))
-  // rooter() render all the views into a root div by default
-  const root = document.createElement("div")
-  root.setAttribute("id", "root")
-  document.body.append(root)
-  // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
-  router()
-  // pushing billsUI into the vDOM
-  window.onNavigate(ROUTES_PATH.NewBill)  
+    // rooter() render all the views into a root div by default
+    document.body.innerHTML = "<div id='root'></div>"
+    // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
+    router()
+    // pushing billsUI into the vDOM
+    window.onNavigate(ROUTES_PATH.NewBill)
 }
+
+// init page + instanciate newbill container to let all the tests access its methods
+function InitWithANewBillInstance() {
+  // document.body.innerHTML = "<div id='root'></div>" WHY ERROR ?!!!!!!
+  const onNavigate = jest.fn // page won't change so won't be called
+  newBillContainer = new NewBill({ document, onNavigate, store: {...store}, localStorage: window.localStorage })
+  document.body.innerHTML = NewBillUI()
+  bodytoTestFile()
+}
+
+let newBillContainer
+Object.defineProperty(window, 'localStorage', { value: {...localStorageMock} })
+window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
-    /*beforeEach(() => console.log('localStorage', localStorageMock))*/
-    beforeAll(() => {
-      return InitNewBillviaOnNavigate()
-    })
+    beforeAll(() => InitNewBillviaOnNavigate())
 
     // * UNIT TEST / when connected as an  / UI : employee dashboard / container/bill.js coverage line 30
     test("Then the page and its form should be displayed", async () => {
@@ -61,26 +61,18 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-// init page + instanciate newbill container to let all the tests access its methods
-function InitWithANewBillInstance() {
-  // newBillContainer = null
-  // document.body.innerHTML = ""
-  const onNavigate = jest.fn
-  Object.defineProperty(window, 'localStorage', { value: {...localStorageMock} })
-  window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-  newBillContainer = new NewBill({ document, onNavigate, store: {...store}, localStorage: window.localStorage })
-  document.body.innerHTML = NewBillUI()
-  bodytoTestFile()
-}
-
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
-    beforeAll(()=>{
-      return InitWithANewBillInstance() 
+    beforeAll(() => newBillContainer = null)
+
+    beforeEach(()=>{
+      InitWithANewBillInstance() 
     })
 
-    
+    afterEach(() => {
+      newBillContainer = null
+    })   
 
     test("Then change file", async () => { // !!! better description
       await waitFor(() => screen.getByTestId('form-new-bill'))
