@@ -49,18 +49,8 @@ describe("Given I am connected as an employee", () => {
 
     test("Then the window icon in the vertical layout should be the only one highlighted", async () => {
 
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee'
-        }))
-        // rooter render all the views into a root div by default
-        const root = document.createElement("div")
-        root.setAttribute("id", "root")
-        document.body.append(root)
-        // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
-        router()
-        // pushing billsUI into the vDOM
-        window.onNavigate(ROUTES_PATH.Bills)
+        InitBillviaOnNavigate()
+        
         await waitFor(() => screen.getByTestId('icon-window'))
         const windowIcon = screen.getByTestId('icon-window')
         // * to-do write expect expression
@@ -81,20 +71,15 @@ describe("Given I am connected as an employee", () => {
     
     // * UNIT TEST / new bill button click / UI : employee dashboard / container/bill.js coverage line 11
     test("then clicking on the 'new bill' button should display the 'new bill' form", async () => { // async to be able to use await waitfor
-        // onNavigate is a fn passed to every containers
-        // so that they can force programmatically the navigation to other pages
-        // the version below is simplified : only updating the documents body
+        // onNavigate necessary on this test since we need to load a new page programmatically after clicking the new bill button
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({ pathname })
         }
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee'
-        }))
         // we need to instanciate the bill container to accces its methods for our test
-        const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
         document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
-        const handleClickNewBillMockFn = jest.fn((e) => billContainer.handleClickNewBill())
+        const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
+        
+        const handleClickNewBillMockFn = jest.fn(billContainer.handleClickNewBill)
         await waitFor(() => screen.getByTestId('btn-new-bill'))
 
         const newBillBtn = screen.getByTestId('btn-new-bill')
@@ -112,15 +97,7 @@ describe("Given I am connected as an employee", () => {
 
     // * UNIT TEST / icon eye button click / UI : employee dashboard / container/bill.js coverage line 23
     test("then clicking on the icon eye button should open a modale", async () => { 
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname })
-        }
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee'
-        }))
-        const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
-        document.body.innerHTML = BillsUI({ data: bills })
+        InitWithABillInstance()
         
         await waitFor(() => screen.getAllByTestId('icon-eye'))
         // select the first eye icon
@@ -139,15 +116,8 @@ describe("Given I am connected as an employee", () => {
     // should test what enter with what gets out of billContainer.getBills() to be a test unit :
     // expect(new Set(await BillsInstance.getBills())).toEqual(new Set(bills)) // SET CAUSE ORDER OF THE ELEMENT WAS DIFFERENT
     test("then passing a mocked store containing 4 bills should lead to 4 bills being displayed", async () => { 
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname })
-        }
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee'
-        }))
-        const mockedStore = store
-        const billContainer = new Bills({ document, onNavigate, store: mockedStore, localStorage: window.localStorage }) // passing the mocked store instead of bills
+        
+      const billContainer = new Bills({ document, onNavigate : jest.fn, store: {...store}, localStorage: window.localStorage }) // passing the mocked store instead of bills
 
         // unit test ?
         expect((await billContainer.getBills()).length).toBe(4) // 4 bills in the mocked store, 4 bills out of getbills
@@ -164,13 +134,6 @@ describe("Given I am connected as an employee", () => {
 
     // * UNIT TEST / we need to test how the bill container handle an invalid date / UI : employee dashboard / container/bill.js coverage line 30
     test("then passing a mocked store containing one invalid date should lead to an invalid date being displayed into the bills table", async () => { 
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Employee'
-      }))
 
       const mockedBill = {
         list() {
@@ -193,10 +156,10 @@ describe("Given I am connected as an employee", () => {
 
       const mockedStore = {
         bills() {
-        return mockedBill
+        return {...mockedBill}
       },}
 
-      const billContainer = new Bills({ document, onNavigate, store: mockedStore, localStorage: window.localStorage }) // passing the mocked store instead of bills
+      const billContainer = new Bills({ document, onNavigate : jest.fn, store: mockedStore, localStorage: window.localStorage }) // passing the mocked store instead of bills
 
       // unit test ?
       expect((await billContainer.getBills())[0].date).toBe('xxxx/xx/xx')
