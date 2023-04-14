@@ -20,14 +20,12 @@ const bodytoTestFile = () => {
 }
 
 let billContainer
+Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
 
 function InitBillviaOnNavigate() {
-  Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-  window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
   // rooter render all the views into a root div by default
-  const root = document.createElement("div")
-  root.setAttribute("id", "root")
-  document.body.append(root)
+  document.body.innerHTML = "<div id='root'></div>"
   // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
   router()
   // pushing billsUI into the vDOM
@@ -38,12 +36,10 @@ function InitWithABillInstance() {
   // onNavigate is a fn passed to every containers
   // so that they can force programmatically the navigation to other pages
   // the version below is simplified : only updating the documents body
-  const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
-  Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-  window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+  // const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
   // we need to instanciate the bill container to accces its methods for our test
   document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
-  billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
+  billContainer = new Bills({ document, onNavigate : jest.fn, store: null, bills:bills, localStorage: window.localStorage })
 }
 
 
