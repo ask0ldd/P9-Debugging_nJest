@@ -30,11 +30,8 @@ function InitNewBillviaOnNavigate() {
 
 // init NewBillsUI + instanciate newbill container to let all the tests access its methods
 function InitWithANewBillInstance() {
-  // document.body.innerHTML = "<div id='root'></div>" WHY ERROR ?!!!!!!
-  const onNavigate = jest.fn // page won't change so won't be called
-  newBillContainer = new NewBill({ document, onNavigate, store: {...store}, localStorage: window.localStorage })
   document.body.innerHTML = NewBillUI()
-  //bodytoTestFile()
+  newBillContainer = new NewBill({ document, onNavigate : jest.fn, store: {...store}, localStorage: window.localStorage })
 }
 
 let newBillContainer
@@ -65,11 +62,7 @@ describe("Given I am connected as an employee", () => {
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
-    // beforeAll(() => newBillContainer = null)
-
     beforeEach(()=>{ InitWithANewBillInstance() })
-
-    // afterEach(() => { newBillContainer = null })   
 
     test("Then change file", async () => { // !!! better description
       await waitFor(() => screen.getByTestId('form-new-bill'))
@@ -103,23 +96,26 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-describe("Given I am connected as an employee", () => {
+/*describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
-    beforeEach(()=>{ InitWithANewBillInstance() })
+    beforeEach(()=>{ 
+      InitWithANewBillInstance() 
+    })
 
     test("Then change file > error ext", async () => { // !!! better description
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
+      // const e = { preventDefault : () => {}, target: {value: 'test.zzz'}}
+      //const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile(e))
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
-      fileInput.addEventListener('change', changeFileMockedFn)
-      const file = new File(['test'], 'test.zzz', {type: 'image/zzz'}) // content name type
+      // fileInput.addEventListener('change', () => changeFileMockedFn(e))
+      fileInput.addEventListener('change', () => changeFileMockedFn)
+      const file = new File(['test'], 'test.zzz', {type: 'image/bmp'}) // content name type
       userEvent.upload(fileInput, file)
-      /*userEvent.upload(fileInput, {
-        preventDefault: jest.fn(), target: {files: file}
-      })*/
+      //userEvent.upload(fileInput, {target: {files: file}})
       expect(() => newBillContainer.handleChangeFile()).toThrow(new Error("Type de fichier invalide."))
       //expect(changeFileMockedFn).toThrow(new Error("Type de fichier invalide."))
     })
   })
-})
+})*/

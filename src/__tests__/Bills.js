@@ -42,8 +42,8 @@ function InitWithABillInstance() {
   Object.defineProperty(window, 'localStorage', { value: localStorageMock })
   window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
   // we need to instanciate the bill container to accces its methods for our test
-  billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
   document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
+  billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
 }
 
 
