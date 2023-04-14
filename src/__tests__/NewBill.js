@@ -64,7 +64,7 @@ describe("Given I am connected as an employee", () => {
 
     beforeEach(()=>{ InitWithANewBillInstance() })
 
-    test("Then change file", async () => { // !!! better description
+    test("Then when calling handleChangeFile with a valid file, .billid and .fileurl should have expected values", async () => {
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
@@ -80,7 +80,7 @@ describe("Given I am connected as an employee", () => {
       // expect(newBillContainer.fileName).toBe('test.jpg')
     })
 
-    test("Then the new bill form should be submitted when i click on the envoyer button", async () => {
+    test("Then the new bill form should be submitted when i click on the submit button", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.jpg"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"
