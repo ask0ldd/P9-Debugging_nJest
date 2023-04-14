@@ -22,6 +22,7 @@ const bodytoTestFile = () => {
 let newBillContainer
 
 function InitNewBillviaOnNavigate() {
+  document.body.innerHTML = ""
   Object.defineProperty(window, 'localStorage', { value: localStorageMock })
   window.localStorage.setItem('user', JSON.stringify({
     type: 'Employee'
@@ -36,15 +37,6 @@ function InitNewBillviaOnNavigate() {
   window.onNavigate(ROUTES_PATH.NewBill)  
 }
 
-// init page + instanciate newbill container to let all the tests access its methods
-function InitWithANewBillInstance() { 
-  const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
-  Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-  window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-  newBillContainer = new NewBill({ document, onNavigate, store: store, localStorage: window.localStorage })
-  document.body.innerHTML = NewBillUI()
-}
-
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
@@ -54,7 +46,8 @@ describe("Given I am connected as an employee", () => {
     })
 
     // * UNIT TEST / when connected as an  / UI : employee dashboard / container/bill.js coverage line 30
-    test("Then the page and its form should be displayed", () => {
+    test("Then the page and its form should be displayed", async () => {
+        await waitFor(() => screen.getByTestId('form-new-bill'))
         expect(screen.getByTestId('form-new-bill')).toBeInTheDocument()
         expect(document.body.querySelector('#btn-send-bill')).toBeInTheDocument()
     })
@@ -68,12 +61,26 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
+// init page + instanciate newbill container to let all the tests access its methods
+function InitWithANewBillInstance() {
+  // newBillContainer = null
+  // document.body.innerHTML = ""
+  const onNavigate = jest.fn
+  Object.defineProperty(window, 'localStorage', { value: {...localStorageMock} })
+  window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+  newBillContainer = new NewBill({ document, onNavigate, store: {...store}, localStorage: window.localStorage })
+  document.body.innerHTML = NewBillUI()
+  bodytoTestFile()
+}
+
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
-    beforeEach(()=>{
+    beforeAll(()=>{
       return InitWithANewBillInstance() 
     })
+
+    
 
     test("Then change file", async () => { // !!! better description
       await waitFor(() => screen.getByTestId('form-new-bill'))
@@ -91,22 +98,6 @@ describe("Given I am connected as an employee", () => {
       // expect(newBillContainer.fileName).toBe('test.jpg')
     })
 
-    /*test("Then change file > error ext", async () => { // !!! better description
-      const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-      const newBillContainer = new NewBill({ document, onNavigate, store: store, localStorage: window.localStorage })
-      document.body.innerHTML = NewBillUI()
-      await waitFor(() => screen.getByTestId('form-new-bill'))
-      const fileInput = screen.getByTestId('file')
-      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
-      fileInput.addEventListener('change', changeFileMockedFn)
-      const file = new File(['test'], 'test.zzz', {type: 'image/zzz'}) // content name type
-      userEvent.upload(fileInput, file)
-      expect(() => newBillContainer.handleChangeFile()).toThrow(new Error("Type de fichier invalide."))
-      //expect(changeFileMockedFn).toThrow(new Error("Type de fichier invalide."))
-    })*/
-
     test("Then the new bill form should be submitted when i click on the envoyer button", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.jpg"
@@ -122,3 +113,20 @@ describe("Given I am connected as an employee", () => {
 
   })
 })
+
+
+    /*test("Then change file > error ext", async () => { // !!! better description
+      const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+      const newBillContainer = new NewBill({ document, onNavigate, store: store, localStorage: window.localStorage })
+      document.body.innerHTML = NewBillUI()
+      await waitFor(() => screen.getByTestId('form-new-bill'))
+      const fileInput = screen.getByTestId('file')
+      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+      fileInput.addEventListener('change', changeFileMockedFn)
+      const file = new File(['test'], 'test.zzz', {type: 'image/zzz'}) // content name type
+      userEvent.upload(fileInput, file)
+      expect(() => newBillContainer.handleChangeFile()).toThrow(new Error("Type de fichier invalide."))
+      //expect(changeFileMockedFn).toThrow(new Error("Type de fichier invalide."))
+    })*/
