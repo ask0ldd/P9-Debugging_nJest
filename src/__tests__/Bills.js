@@ -84,7 +84,7 @@ describe("Given I am connected as an employee", () => {
     })
     
     // * UNIT TEST / new bill button click / UI : employee dashboard / container/bill.js coverage line 11
-    test("then clicking on the new bill button should display the new bill form", async () => { // async to be able to use await waitfor
+    test("then clicking on the 'new bill' button should display the 'new bill' form", async () => { // async to be able to use await waitfor
         // onNavigate is a fn passed to every containers
         // so that they can force programmatically the navigation to other pages
         // the version below is simplified : only updating the documents body
@@ -138,8 +138,10 @@ describe("Given I am connected as an employee", () => {
         expect($.fn.modal).toHaveBeenCalledWith('show') 
     })
 
-    // * UNIT TEST / we need to test the getbill() fn of the bill container / UI : employee dashboard / container/bill.js coverage line 30
+    // * UNIT TEST (more an integration test in reality???!!!) / we need to test the getbill() fn of the bill container / UI : employee dashboard / container/bill.js coverage line 30
     // function called into app/router.js
+    // should test what enter with what gets out of billContainer.getBills() to be a test unit :
+    // expect(new Set(await BillsInstance.getBills())).toEqual(new Set(bills)) // SET CAUSE ORDER OF THE ELEMENT WAS DIFFERENT
     test("then passing a mocked store containing 4 bills should lead to 4 bills being displayed", async () => { 
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({ pathname })

@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { screen, waitFor } from "@testing-library/dom"
+import { fireEvent, screen, waitFor } from "@testing-library/dom"
 import '@testing-library/jest-dom' // .toBeInTheDocument() matcher
 import userEvent from '@testing-library/user-event'
 import NewBillUI from "../views/NewBillUI.js"
@@ -18,22 +18,23 @@ const bodytoTestFile = () => {
   fs.writeFile('../test.txt', document.body.innerHTML, err => { if (err) { console.error(err) } })
 }
 
+// verticalLayout + NewBillsUI
 function InitNewBillviaOnNavigate() {
     // rooter() render all the views into a root div by default
     document.body.innerHTML = "<div id='root'></div>"
-    // define window.onNavigate : app/router.js / onNavigate +-= window.history.pushState()
+    // define window.onNavigate (app/router.js) : a derivative of window.history.pushState()
     router()
-    // pushing billsUI into the vDOM
+    // pushing verticalLayout + billsUI into the vDOM
     window.onNavigate(ROUTES_PATH.NewBill)
 }
 
-// init page + instanciate newbill container to let all the tests access its methods
+// init NewBillsUI + instanciate newbill container to let all the tests access its methods
 function InitWithANewBillInstance() {
   // document.body.innerHTML = "<div id='root'></div>" WHY ERROR ?!!!!!!
   const onNavigate = jest.fn // page won't change so won't be called
   newBillContainer = new NewBill({ document, onNavigate, store: {...store}, localStorage: window.localStorage })
   document.body.innerHTML = NewBillUI()
-  bodytoTestFile()
+  //bodytoTestFile()
 }
 
 let newBillContainer
@@ -64,15 +65,11 @@ describe("Given I am connected as an employee", () => {
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
-    beforeAll(() => newBillContainer = null)
+    // beforeAll(() => newBillContainer = null)
 
-    beforeEach(()=>{
-      InitWithANewBillInstance() 
-    })
+    beforeEach(()=>{ InitWithANewBillInstance() })
 
-    afterEach(() => {
-      newBillContainer = null
-    })   
+    // afterEach(() => { newBillContainer = null })   
 
     test("Then change file", async () => { // !!! better description
       await waitFor(() => screen.getByTestId('form-new-bill'))
@@ -106,19 +103,23 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
+describe("Given I am connected as an employee", () => {
+  describe("When I am on NewBill Page", () => {
 
-    /*test("Then change file > error ext", async () => { // !!! better description
-      const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
-      const newBillContainer = new NewBill({ document, onNavigate, store: store, localStorage: window.localStorage })
-      document.body.innerHTML = NewBillUI()
+    beforeEach(()=>{ InitWithANewBillInstance() })
+
+    test("Then change file > error ext", async () => { // !!! better description
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
       fileInput.addEventListener('change', changeFileMockedFn)
       const file = new File(['test'], 'test.zzz', {type: 'image/zzz'}) // content name type
       userEvent.upload(fileInput, file)
+      /*userEvent.upload(fileInput, {
+        preventDefault: jest.fn(), target: {files: file}
+      })*/
       expect(() => newBillContainer.handleChangeFile()).toThrow(new Error("Type de fichier invalide."))
       //expect(changeFileMockedFn).toThrow(new Error("Type de fichier invalide."))
-    })*/
+    })
+  })
+})
