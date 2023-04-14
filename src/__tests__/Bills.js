@@ -35,8 +35,7 @@ function InitBillviaOnNavigate() {
 function InitWithABillInstance() { 
   // onNavigate is a fn passed to every containers
   // so that they can force programmatically the navigation to other pages
-  // the version below is simplified : only updating the documents body
-  // const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({ pathname }) }
+  // not needed here
   // we need to instanciate the bill container to accces its methods for our test
   document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
   billContainer = new Bills({ document, onNavigate : jest.fn, store: null, bills:bills, localStorage: window.localStorage })
