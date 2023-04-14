@@ -29,7 +29,7 @@ export default class NewBill {
     // correction / ajout :
     const ext = file.name.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
-      // throw new Error("Type de fichier invalide.")
+      throw new Error("Type de fichier invalide.")
     }
     //
     const formData = new FormData()

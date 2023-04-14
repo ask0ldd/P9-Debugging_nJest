@@ -103,27 +103,16 @@ describe("Given I am connected as an employee", () => {
       InitWithANewBillInstance() 
     })
 
-    test("Then change file > error ext", async () => { // !!! better description
-      //jest.spyOn(event, 'preventDefault')
-
+    test("Then handleChangeFile should throw an error when fed with an invalid file", async () => { // !!! better description
       await waitFor(() => screen.getByTestId('form-new-bill'))
-      bodytoTestFile()
-      const fileInput = screen.getByTestId('file')
+      // const fileInput = screen.getByTestId('file')
       const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
-      //const wrongFile = new File(['test'], 'https://localhost:3456/images/test.zzz', {type: 'image/bmp'}) // content name type
-      // const e = { preventDefault : () => {}, target: {value: 'test.zzz'}}
-      //const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile(e))
-      // const event = { preventDefault: () => {}, target: fileInput , files:[file] }
-      // const event = { preventDefault: () => {}, target: 'input.form-control.blue-border'}
       const event = { preventDefault: () => {}, target:{ value : 'https://localhost:3456/images/test.zzz', files:{ 0 : file}}}
-      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile(event))
-      // fileInput.addEventListener('change', () => changeFileMockedFn(e))
-      fileInput.addEventListener('change', () => changeFileMockedFn)
-      userEvent.upload(fileInput, file)
-      expect(fileInput.files[0]).toStrictEqual(file)
-      // userEvent.upload(fileInput, {target: {value:'test.zzz', files: [file]}, preventDefault() {jest.fn()}},)
-      // expect(changeFileMockedFn).toThrow(new Error("Type de fichier invalide."))
-      //expect(changeFileMockedFn).toThrow(new Error("Type de fichier invalide."))
+      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+      // fileInput.addEventListener('change', () => changeFileMockedFn) // for integration test
+      // userEvent.upload(fileInput, file)
+      // expect(fileInput.files[0]).toStrictEqual(file)
+      expect(() => changeFileMockedFn(event)).toThrow("Type de fichier invalide.")
     })
   })
 })
