@@ -16,13 +16,13 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate })
   }
   handleChangeFile = e => {
-    console.log(e)
+    // console.log(e)
     e.preventDefault()
     // const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const file = e.target.files[0]
-    console.log(e.target)
+    // console.log(e.target)
     const filePath = e.target.value.split(/\\/g)
-    console.log(filePath)
+    // console.log(filePath)
     const fileName = filePath[filePath.length-1]
     // [Bug Hunt] - Bills
     // extension not checked --- needs some improvements MIME TYPES
@@ -46,7 +46,7 @@ export default class NewBill {
         }
       })
       .then(({fileUrl, key}) => {
-        console.log(fileUrl)
+        // console.log(fileUrl)
         this.billId = key
         this.fileUrl = fileUrl
         this.fileName = fileName
@@ -54,7 +54,7 @@ export default class NewBill {
   }
   handleSubmit = e => {
     e.preventDefault()
-    console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
+    // console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
     const email = JSON.parse(localStorage.getItem("user")).email
     const bill = {
       email,
@@ -78,6 +78,7 @@ export default class NewBill {
     }
     //
     this.updateBill(bill)
+    console.log(this.store.bills().list())
     this.onNavigate(ROUTES_PATH['Bills'])
   }
 

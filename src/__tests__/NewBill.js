@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { fireEvent, screen, waitFor } from "@testing-library/dom"
+import { screen, waitFor } from "@testing-library/dom"
 import '@testing-library/jest-dom' // .toBeInTheDocument() matcher
 import userEvent from '@testing-library/user-event'
 import NewBillUI from "../views/NewBillUI.js"
@@ -32,6 +32,15 @@ function InitNewBillviaOnNavigate() {
 function InitWithANewBillInstance() {
   document.body.innerHTML = NewBillUI()
   newBillContainer = new NewBill({ document, onNavigate : jest.fn, store: {...store}, localStorage: window.localStorage })
+}
+
+function fillForm(){
+  userEvent.type(screen.getByTestId("expense-name"), "resto")
+  userEvent.type(screen.getByTestId("amount"), "100")
+  userEvent.type(screen.getByTestId("datepicker"), "2023-04-20")
+  userEvent.type(screen.getByTestId("vat"), "20")
+  userEvent.type(screen.getByTestId("pct"), "20")
+  userEvent.type(screen.getByTestId("commentary"), "commentary")
 }
 
 let newBillContainer
@@ -80,7 +89,7 @@ describe("Given I am connected as an employee", () => {
       // expect(newBillContainer.fileName).toBe('test.jpg')
     })
 
-    test("Then the new bill form should be submitted when i click on the submit button", async () => {
+    test("Then the form should be submitted when i click on the submit button", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.jpg"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"
@@ -93,48 +102,38 @@ describe("Given I am connected as an employee", () => {
         expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
     })
 
-    test("then an error should be thrown when I submit the form with an invalid file", () => {
+    test("then an error should be thrown when I submit the form containing an invalid file", async () => { // improve
         newBillContainer.fileName = "test.zzz"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.zzz"
         // const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
-        //userEvent.type(screen.getByTestId("expense-type"), "resto")
-        userEvent.type(screen.getByTestId("expense-name"), "resto")
-        userEvent.type(screen.getByTestId("amount"), "100")
-        userEvent.type(screen.getByTestId("datepicker"), "2023-04-20")
-        userEvent.type(screen.getByTestId("vat"), "20")
-        userEvent.type(screen.getByTestId("pct"), "20")
-        userEvent.type(screen.getByTestId("commentary"), "commentary")
+        fillForm()
         const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
         const formNewBill = screen.getByTestId('form-new-bill')
         const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
         formNewBill.addEventListener('submit', () => clickSubmitNewBillMockedFn(event))
         const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
-        // try{userEvent.click(sendNewBillBtn)}
+        /*try {
+          userEvent.click(sendNewBillBtn)
+        } catch (error) {
+
+        }*/
+        // expect(() => userEvent.click(sendNewBillBtn)).toThrow("Type de fichier invalide.")
         expect(() => clickSubmitNewBillMockedFn(event)).toThrow("Type de fichier invalide.")
     })
 
-    test("then no should be thrown when I submit the form with a valid file", () => {
+    test("then the api should be called when I submit the form containing a valid file", async () => {
       newBillContainer.fileName = "test.jpg"
-      newBillContainer.fileUrl = "https://localhost:3456/images/test.jph"
+      newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"
       // const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
-      //userEvent.type(screen.getByTestId("expense-type"), "resto")
-      userEvent.type(screen.getByTestId("expense-name"), "resto")
-      userEvent.type(screen.getByTestId("amount"), "100")
-      userEvent.type(screen.getByTestId("datepicker"), "2023-04-20")
-      userEvent.type(screen.getByTestId("vat"), "20")
-      userEvent.type(screen.getByTestId("pct"), "20")
-      userEvent.type(screen.getByTestId("commentary"), "commentary")
+      fillForm()
       const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
       const formNewBill = screen.getByTestId('form-new-bill')
       const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
       formNewBill.addEventListener('submit', () => clickSubmitNewBillMockedFn(event))
       const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
-      // const mockedNavigate = jest.fn(newBillContainer.onNavigate)
-      // const mockedUpdBill = jest.fn(newBillContainer.updateBill)
+      newBillContainer.updateBill = jest.fn(newBillContainer.updateBill)
       userEvent.click(sendNewBillBtn)
-      //expect(newBillContainer.store.mockedBills.list()[0]).toBe()
-      // expect(mockedNavigate).toHaveBeenCalled()
-      // expect(mockedUpdBill).toHaveBeenCalled()
+      expect(newBillContainer.updateBill).toHaveBeenCalled()
   })
 
   })
