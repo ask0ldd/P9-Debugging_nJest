@@ -16,20 +16,17 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate })
   }
   handleChangeFile = e => {
-    // console.log(e)
     e.preventDefault()
     // const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const file = e.target.files[0]
-    // console.log(e.target)
     const filePath = e.target.value.split(/\\/g)
-    // console.log(filePath)
     const fileName = filePath[filePath.length-1]
     // [Bug Hunt] - Bills
-    // extension not checked --- needs some improvements MIME TYPES
     // correction / ajout :
-    const ext = file.name.split('.')[1]
-    if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
-      throw new Error("Type de fichier invalide.")
+    if(file.type!=="image/jpg" && file.type!=="image/jpeg" && file.type!=="image/png") {
+      e.target.value = ""
+      e.target.files = []
+      // throw new Error("Type de fichier invalide.")
     }
     //
     const formData = new FormData()
@@ -52,6 +49,7 @@ export default class NewBill {
         this.fileName = fileName
       }).catch(error => console.error(error))
   }
+
   handleSubmit = e => {
     e.preventDefault()
     // console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
@@ -70,7 +68,6 @@ export default class NewBill {
       status: 'pending'
     }
     // [Bug Hunt] - Bills
-    // extension not checked --- needs some improvements MIME TYPES
     // correction / ajout :
     const ext = bill.fileName.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {

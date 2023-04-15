@@ -93,6 +93,10 @@ describe("Given I am connected as an employee", () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.jpg"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"
+        /*const file = new File(['test'], 'test.jpg', {type: 'image/jpg'})
+        const fileInput = screen.getByTestId('file')
+        userEvent.upload(fileInput, file)
+        await waitFor(() =>  screen.getByTestId('file').value==="test.jpg")*/
         // needs to define newBill.filename to simulate a file has been selected before submitting
         const formNewBill = screen.getByTestId('form-new-bill')
         const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
@@ -118,6 +122,7 @@ describe("Given I am connected as an employee", () => {
 
         }*/
         // expect(() => userEvent.click(sendNewBillBtn)).toThrow("Type de fichier invalide.")
+
         expect(() => clickSubmitNewBillMockedFn(event)).toThrow("Type de fichier invalide.")
     })
 
@@ -147,16 +152,17 @@ describe("Given I am connected as an employee", () => {
       InitWithANewBillInstance() 
     })
 
-    test("Then handleChangeFile should throw an error when fed with an invalid file", async () => { // !!! better description
+    test("Then handleChangeFile should throw an error when confronted to an invalid file", async () => {
       await waitFor(() => screen.getByTestId('form-new-bill'))
-      // const fileInput = screen.getByTestId('file')
+      const fileInput = screen.getByTestId('file')
       const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
       const event = { preventDefault: () => {}, target:{ value : 'https://localhost:3456/images/test.zzz', files:{ 0 : file}}}
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
-      // fileInput.addEventListener('change', () => changeFileMockedFn) // for integration test
-      // userEvent.upload(fileInput, file)
-      // expect(fileInput.files[0]).toStrictEqual(file)
-      expect(() => changeFileMockedFn(event)).toThrow("Type de fichier invalide.")
+      fileInput.addEventListener('change', () => changeFileMockedFn) // for integration test
+      userEvent.upload(fileInput, file)
+      expect(fileInput.value).toBe("")
+      expect(fileInput.files).toStrictEqual([])
+      //expect(() => changeFileMockedFn(event)).toThrow("Type de fichier invalide.")
     })
   })
 })
