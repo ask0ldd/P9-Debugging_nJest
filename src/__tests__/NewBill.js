@@ -93,9 +93,54 @@ describe("Given I am connected as an employee", () => {
         expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
     })
 
+    test("then an error should be thrown when I submit the form with an invalid file", () => {
+        newBillContainer.fileName = "test.zzz"
+        newBillContainer.fileUrl = "https://localhost:3456/images/test.zzz"
+        // const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
+        //userEvent.type(screen.getByTestId("expense-type"), "resto")
+        userEvent.type(screen.getByTestId("expense-name"), "resto")
+        userEvent.type(screen.getByTestId("amount"), "100")
+        userEvent.type(screen.getByTestId("datepicker"), "2023-04-20")
+        userEvent.type(screen.getByTestId("vat"), "20")
+        userEvent.type(screen.getByTestId("pct"), "20")
+        userEvent.type(screen.getByTestId("commentary"), "commentary")
+        const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
+        const formNewBill = screen.getByTestId('form-new-bill')
+        const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
+        formNewBill.addEventListener('submit', () => clickSubmitNewBillMockedFn(event))
+        const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
+        // try{userEvent.click(sendNewBillBtn)}
+        expect(() => clickSubmitNewBillMockedFn(event)).toThrow("Type de fichier invalide.")
+    })
+
+    test("then no should be thrown when I submit the form with a valid file", () => {
+      newBillContainer.fileName = "test.jpg"
+      newBillContainer.fileUrl = "https://localhost:3456/images/test.jph"
+      // const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
+      //userEvent.type(screen.getByTestId("expense-type"), "resto")
+      userEvent.type(screen.getByTestId("expense-name"), "resto")
+      userEvent.type(screen.getByTestId("amount"), "100")
+      userEvent.type(screen.getByTestId("datepicker"), "2023-04-20")
+      userEvent.type(screen.getByTestId("vat"), "20")
+      userEvent.type(screen.getByTestId("pct"), "20")
+      userEvent.type(screen.getByTestId("commentary"), "commentary")
+      const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
+      const formNewBill = screen.getByTestId('form-new-bill')
+      const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
+      formNewBill.addEventListener('submit', () => clickSubmitNewBillMockedFn(event))
+      const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
+      // const mockedNavigate = jest.fn(newBillContainer.onNavigate)
+      // const mockedUpdBill = jest.fn(newBillContainer.updateBill)
+      userEvent.click(sendNewBillBtn)
+      //expect(newBillContainer.store.mockedBills.list()[0]).toBe()
+      // expect(mockedNavigate).toHaveBeenCalled()
+      // expect(mockedUpdBill).toHaveBeenCalled()
+  })
+
   })
 })
 
+// UNIT TEST
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
