@@ -22,13 +22,14 @@ export default class NewBill {
     e.preventDefault()
     // const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const file = e.target.files[0]
+    console.log('---------file : ', file.name)
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
     // [Bug Hunt] - Bills
     // correction / ajout :
     if(file.type!=="image/jpg" && file.type!=="image/jpeg" && file.type!=="image/png") {
       e.target.value = ""
-      e.target.files = []
+      return e.target.files = []
     }
     //
     const formData = new FormData()
@@ -84,7 +85,7 @@ export default class NewBill {
     this.onNavigate(ROUTES_PATH['Bills'])
   }
 
-  
+
   // not need to cover this function by tests
   updateBill = (bill) => {
     if (this.store) {

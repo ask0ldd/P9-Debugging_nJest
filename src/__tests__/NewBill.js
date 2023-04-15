@@ -92,10 +92,11 @@ describe("Given I am connected as an employee", () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.jpg"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"
-        /*const file = new File(['test'], 'test.jpg', {type: 'image/jpg'})
+        // better process but still buggy
+        /*const file = new File(['test'], 'test2.jpg', {type: 'image/jpg'})
         const fileInput = screen.getByTestId('file')
         userEvent.upload(fileInput, file)
-        await waitFor(() =>  screen.getByTestId('file').value==="test.jpg")*/
+        await waitFor(() =>  screen.getByTestId('file').value==="test2.jpg")*/
         // needs to define newBill.filename to simulate a file has been selected before submitting
         const formNewBill = screen.getByTestId('form-new-bill')
         const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
@@ -115,11 +116,7 @@ describe("Given I am connected as an employee", () => {
         const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
         formNewBill.addEventListener('submit', () => clickSubmitNewBillMockedFn(event))
         const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
-        /*try {
-          userEvent.click(sendNewBillBtn)
-        } catch (error) {
 
-        }*/
         // expect(() => userEvent.click(sendNewBillBtn)).toThrow("Type de fichier invalide.")
 
         expect(() => clickSubmitNewBillMockedFn(event)).toThrow("Type de fichier invalide.")
