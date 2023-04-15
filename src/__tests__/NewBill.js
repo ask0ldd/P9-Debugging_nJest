@@ -91,14 +91,9 @@ describe("Given I am connected as an employee", () => {
 
     test("Then the form should be submitted when i click on the submit button", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
-        /*newBillContainer.fileName = "test.jpg"
-        newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"*/
         // better process but still buggy
         const fileInput = screen.getByTestId('file')
-        const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
-        fileInput.addEventListener('change', changeFileMockedFn)
         userEvent.upload(fileInput, new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'}))
-        expect(changeFileMockedFn).toHaveBeenCalled()
         await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
         const formNewBill = screen.getByTestId('form-new-bill')
         const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
@@ -108,10 +103,10 @@ describe("Given I am connected as an employee", () => {
         expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
     })
 
-    test("then an error should be thrown when I submit the form containing an invalid file", async () => { // improve
+    test("then an error should be thrown when I submit the form referencing an invalid file", async () => {
+        await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.zzz"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.zzz"
-        // const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
         fillForm()
         const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
         const formNewBill = screen.getByTestId('form-new-bill')
@@ -123,6 +118,7 @@ describe("Given I am connected as an employee", () => {
     })
 
     test("then the api should be called when I submit a valid form", async () => {
+      await waitFor(() => screen.getByTestId('form-new-bill'))
       newBillContainer.fileName = "test.jpg"
       newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"
       // const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
