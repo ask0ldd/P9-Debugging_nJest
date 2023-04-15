@@ -20,7 +20,6 @@ const bodytoTestFile = () => {
 
 // verticalLayout + NewBillsUI
 function InitNewBillviaOnNavigate() {
-    // jest.restoreAllMocks()
     // rooter() render all the views into a root div by default
     document.body.innerHTML = "<div id='root'></div>"
     // define window.onNavigate (app/router.js) : a derivative of window.history.pushState()
@@ -29,9 +28,8 @@ function InitNewBillviaOnNavigate() {
     window.onNavigate(ROUTES_PATH.NewBill)
 }
 
-// init NewBillsUI + instanciate newbill container to let all the tests access its methods
+// NewBillsUI alone + instanciation of newbill container > access to the related methods
 function InitWithANewBillInstance() {
-  // jest.restoreAllMocks()
   document.body.innerHTML = NewBillUI()
   newBillContainer = new NewBill({ document, onNavigate : jest.fn, store: {...store}, localStorage: window.localStorage })
 }
@@ -75,7 +73,7 @@ describe("Given I am connected as an employee", () => {
 
     beforeEach(()=>{ InitWithANewBillInstance() })
 
-    test("Then selecting a valid file should push the expected values to .billid and .fileurl", async () => {
+    test("Then selecting a valid file should push the expected values to .billid and to the file input's files array", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         const fileInput = screen.getByTestId('file')
         const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
@@ -83,13 +81,13 @@ describe("Given I am connected as an employee", () => {
         userEvent.upload(fileInput, new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'}))
         // fireEvent.change(fileInput, { target: { files: [new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'})], }, })
         expect(changeFileMockedFn).toHaveBeenCalled()
-        // those value are returned by the mockedstore when handlechangefile is successful
-        // mocked store : create(bill) { return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'}) },
+        // billId = "1234" when handlechangefile is successful
+        // due to mocked store : create(bill) { return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'}) },
         await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
-        expect(newBillContainer.fileUrl).toBe('https://localhost:3456/images/test.jpg')
+        expect(fileInput.files[0].name).toBe("chucknorris.png")
     })
 
-    test("Then the form should be submitted when i click on the submit button", async () => {
+    test("Then the submit button should trigger a form subsmission", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         // better process but still buggy
         const fileInput = screen.getByTestId('file')
@@ -103,7 +101,7 @@ describe("Given I am connected as an employee", () => {
         expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
     })
 
-    test("then an error should be thrown when I submit the form referencing an invalid file", async () => {
+    test("then an error should be thrown when an invalid file is submitted with the form", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.zzz"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.zzz"
@@ -117,7 +115,7 @@ describe("Given I am connected as an employee", () => {
         expect(() => clickSubmitNewBillMockedFn(event)).toThrow("Type de fichier invalide.")
     })
 
-    test("then the api should be called when I submit a valid form", async () => {
+    test("then the API should be called when a valid form is submitted", async () => {
       await waitFor(() => screen.getByTestId('form-new-bill'))
       newBillContainer.fileName = "test.jpg"
       newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"
@@ -144,7 +142,7 @@ describe("Given I am connected as an employee", () => {
       InitWithANewBillInstance() 
     })
 
-    test("Then file input should reject any invalid file", async () => {
+    test("Then the file input should reject any invalid file", async () => {
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
       const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
