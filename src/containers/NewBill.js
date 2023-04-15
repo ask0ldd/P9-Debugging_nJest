@@ -15,6 +15,9 @@ export default class NewBill {
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
   }
+
+
+
   handleChangeFile = e => {
     e.preventDefault()
     // const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
@@ -26,7 +29,6 @@ export default class NewBill {
     if(file.type!=="image/jpg" && file.type!=="image/jpeg" && file.type!=="image/png") {
       e.target.value = ""
       e.target.files = []
-      // throw new Error("Type de fichier invalide.")
     }
     //
     const formData = new FormData()
@@ -42,13 +44,16 @@ export default class NewBill {
           noContentType: true
         }
       })
+      // if insertion is a success : this.fileName = the input file name, this.billID = "1234", this.fileUrl = 'https://localhost:3456/images/test.jpg'
+      // "1234" and the url are returned by create(bill)
       .then(({fileUrl, key}) => {
-        // console.log(fileUrl)
         this.billId = key
         this.fileUrl = fileUrl
         this.fileName = fileName
       }).catch(error => console.error(error))
   }
+
+
 
   handleSubmit = e => {
     e.preventDefault()
@@ -79,6 +84,7 @@ export default class NewBill {
     this.onNavigate(ROUTES_PATH['Bills'])
   }
 
+  
   // not need to cover this function by tests
   updateBill = (bill) => {
     if (this.store) {
