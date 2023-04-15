@@ -20,11 +20,12 @@ export default class NewBill {
 
   handleChangeFile = e => {
     e.preventDefault()
-    // const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const file = e.target.files[0]
-    console.log('---------file : ', file.name)
-    const filePath = e.target.value.split(/\\/g)
+    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+    const filePath = (file.name).split('/\\/g')
     const fileName = filePath[filePath.length-1]
+    console.log('---------ft : ', file.name)
+    console.log('---------fnt : ', fileName)
+    console.log('---------fpt : ', filePath)
     // [Bug Hunt] - Bills
     // correction / ajout :
     if(file.type!=="image/jpg" && file.type!=="image/jpeg" && file.type!=="image/png") {
@@ -73,15 +74,19 @@ export default class NewBill {
       fileName: this.fileName,
       status: 'pending'
     }
+
     // [Bug Hunt] - Bills
     // correction / ajout :
-    const ext = bill.fileName.split('.')[1]
+    const ext = this.fileName.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
+      console.log('---------id : ', this.fileName)
+      console.log('---------id : ', this.fileUrl)
+      console.log('---------id : ', this.billId)
       throw new Error("Type de fichier invalide.")
     }
     //
     this.updateBill(bill)
-    console.log(this.store.bills().list())
+    // console.log(this.store.bills().list())
     this.onNavigate(ROUTES_PATH['Bills'])
   }
 
