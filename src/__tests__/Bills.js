@@ -10,7 +10,7 @@ import Bills from "../containers/Bills.js";
 import { bills } from "../fixtures/bills.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
-import store from "../__mocks__/store.js";
+import mockStore from "../__mocks__/store.js";
 
 import router from "../app/Router.js";
 
@@ -20,6 +20,8 @@ const bodytoTestFile = () => {
 }
 
 let billContainer
+
+// init local storage
 Object.defineProperty(window, 'localStorage', { value: localStorageMock })
 window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
 
@@ -37,7 +39,7 @@ function InitWithABillInstance() {
   // so that they can force the navigation to any other pages
   // we need to instanciate the bill container to accces its methods for our test
   document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
-  billContainer = new Bills({ document, onNavigate : jest.fn, store: null, bills:bills, localStorage: window.localStorage })
+  billContainer = new Bills({ document, onNavigate : jest.fn, store: null, localStorage: window.localStorage })
 }
 
 
@@ -106,25 +108,15 @@ describe("Given I am connected as an employee", () => {
         expect($.fn.modal).toHaveBeenCalledWith('show') 
     })
 
-    // * UNIT TEST (more an integration test in reality???!!!) / we need to test the getbill() fn of the bill container / UI : employee dashboard / container/bill.js coverage line 30
+    // * UNIT TEST / check if mockeStore bills (>IN) = container.getBills() bills (OUT>) / UI : employee dashboard / container/bill.js coverage line 30
     // function called into app/router.js
-    // should test what enter with what gets out of billContainer.getBills() to be a test unit :
-    // expect(new Set(await BillsInstance.getBills())).toEqual(new Set(bills)) // SET CAUSE ORDER OF THE ELEMENT WAS DIFFERENT
-    test("then passing a mocked store containing 4 bills should lead to 4 bills being displayed", async () => { 
-        
-      const billContainer = new Bills({ document, onNavigate : jest.fn, store: {...store}, localStorage: window.localStorage }) // passing the mocked store instead of bills
-
-        // unit test ?
-        expect((await billContainer.getBills()).length).toBe(4) // 4 bills in the mocked store, 4 bills out of getbills
-
-        document.body.innerHTML = BillsUI({data : await billContainer.getBills()}) // passed as data
-        // integration test ?
-        await waitFor(() => screen.getAllByTestId('icon-eye'))
-        expect(screen.getByText('encore')).toBeInTheDocument() // 4 bills in the mocked store, 4 expected names & 4 icon eyes into the bills table
-        expect(screen.getByText('test1')).toBeInTheDocument()
-        expect(screen.getByText('test2')).toBeInTheDocument()
-        expect(screen.getByText('test3')).toBeInTheDocument()
-        expect(screen.getAllByTestId('icon-eye').length).toBe(4)
+    test("then passing our mockedStore to the bills container should lead to .getbills() returning an array of 4 elements", async () => { 
+      const billContainer = new Bills({ document, onNavigate : jest.fn, store: {...mockStore}, localStorage: window.localStorage }) // passing the mocked store instead of bills
+      
+      // 4 bills IN : the mocked store, 4 bills OUT of getbills
+      expect((await billContainer.getBills()).length).toBe(4)
+      // besides the date property bills IN should be equal to bills OUT
+      expect(new Set(await billContainer.getBills()).forEach(bill => bill.date = "")).toEqual(new Set(bills).forEach(bill => bill.date = "")) // Set because differents bills order between IN & OUT
     })
 
     // * UNIT TEST / we need to test how the bill container handle an invalid date / UI : employee dashboard / container/bill.js coverage line 30
@@ -141,7 +133,7 @@ describe("Given I am connected as an employee", () => {
             "commentary": "séminaire billed",
             "name": "encore",
             "fileName": "preview-facture-free-201801-pdf-1.jpg",
-            "date": "xxxx/xx/xx", // invalid date inserted
+            "date": "xxxx/xx/xx", // invalid date inserted on purpose
             "amount": 400,
             "commentAdmin": "ok",
             "email": "a@a",
@@ -166,4 +158,50 @@ describe("Given I am connected as an employee", () => {
     })
 
   })
+})
+
+// integration test : GET from API
+
+jest.mock("../app/store", () => mockStore)
+
+describe("Given I am connected as an employee", () => {
+  describe("When I am on the Bills Page", () => {
+    test("Then a succesfull fetch should lead to 4 specific bills being displayed", async () => {
+      InitBillviaOnNavigate()
+      await waitFor(() => screen.getAllByTestId('icon-eye'))
+      // 4 bills in the mocked store > 4 expected bills names & 4 eyes icons into the bills table
+      expect(screen.getByText('encore')).toBeInTheDocument() 
+      expect(screen.getByText('test1')).toBeInTheDocument()
+      expect(screen.getByText('test2')).toBeInTheDocument()
+      expect(screen.getByText('test3')).toBeInTheDocument()
+      expect(screen.getAllByTestId('icon-eye').length).toBe(4)
+    })
+
+    test("404 error", async () => {
+      // jest.spyOn(mockStore, "bills")
+      mockStore.bills = jest.fn(mockStore.bills)
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list : () =>  {
+            return Promise.reject(new Error("Erreur 404"))
+          }
+      }})
+      InitBillviaOnNavigate()
+      expect(await waitFor(() => screen.getByText(/Erreur 404/))).toBeInTheDocument()
+    })
+
+    test("500 error", async () => {
+      mockStore.bills = jest.fn(mockStore.bills)
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list : () =>  {
+            return Promise.reject(new Error("Erreur 500"))
+          }
+      }})
+      InitBillviaOnNavigate()
+      expect(await waitFor(() => screen.getByText(/Erreur 500/))).toBeInTheDocument()
+    })
+
+  })
+
 })
