@@ -82,7 +82,8 @@ export default class NewBill {
       console.log('---------id : ', this.fileName)
       console.log('---------id : ', this.fileUrl)
       console.log('---------id : ', this.billId)
-      throw new Error("Type de fichier invalide.")
+      // throw new Error("Type de fichier invalide.")
+      return window.alert("Type de fichier invalide.")
     }
     //
     this.updateBill(bill)
