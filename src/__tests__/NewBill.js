@@ -153,7 +153,6 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-// 201 created / 400 (Bad Request) / 401 (Unauthorized) / 403 (Forbidden) / 412 (Precondition Failed) / 500 (Internal Server Error)
 
 // integration test : interactions POST
 
@@ -166,6 +165,7 @@ describe("Given I am connected as an employee", () => {
       jest.spyOn(console, "error") 
     })
 
+    // 201 (Success)
     test("Then a succesfull POST", async () => {
       InitWithANewBillInstance()
       await waitFor(() => screen.getByTestId('form-new-bill'))
@@ -180,26 +180,82 @@ describe("Given I am connected as an employee", () => {
       expect(newBillContainer.fileName).toBe("dracula.png")
     })
 
-    
-        test("Then an API call failing with a 500 error should console.error 500 error message", async () => {
-          mockStore.bills = jest.fn(mockStore.bills)
-          mockStore.bills.mockImplementationOnce(() => {
-            return {
-              create : () =>  {
-                return Promise.reject("Erreur 500")
-              }
-          }})
-          InitNewBillviaOnNavigate()
-          const fileInput = screen.getByTestId('file')
-          const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
-          fileInput.addEventListener('change', changeFileMockedFn)
-          userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
-          expect(changeFileMockedFn).toHaveBeenCalled()
-          const error = "Erreur 500"
-          await waitFor(() => expect(console.error).toBeCalledWith(error))
-        })
+    // 500 (Internal Server Error)
+    test("Then an API call failing with a 500 error should console.error a 500 error message", async () => {
+      mockStore.bills = jest.fn(mockStore.bills)
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          create : () =>  {
+            return Promise.reject("Erreur 500")
+          }
+        }
+      })
+      InitNewBillviaOnNavigate()
+      const fileInput = screen.getByTestId('file')
+      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+      fileInput.addEventListener('change', changeFileMockedFn)
+      userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
+      expect(changeFileMockedFn).toHaveBeenCalled()
+      const expectedError = "Erreur 500"
+      await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
+    })
+
+    // 400 (Bad Request)
+    test("Then an API call failing with a 400 error should console.error a 400 error message", async () => {
+      mockStore.bills = jest.fn(mockStore.bills)
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          create : () =>  {
+            return Promise.reject("Erreur 400")
+          }
+      }})
+      InitNewBillviaOnNavigate()
+      const fileInput = screen.getByTestId('file')
+      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+      fileInput.addEventListener('change', changeFileMockedFn)
+      userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
+      expect(changeFileMockedFn).toHaveBeenCalled()
+      const error = "Erreur 400"
+      await waitFor(() => expect(console.error).toBeCalledWith(error))
+    })
+
+    // 401 (Unauthorized)
+    test("Then an API call failing with a 401 error should console.error a 401 error message", async () => {
+      mockStore.bills = jest.fn(mockStore.bills)
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          create : () =>  {
+            return Promise.reject("Erreur 401")
+          }
+      }})
+      InitNewBillviaOnNavigate()
+      const fileInput = screen.getByTestId('file')
+      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+      fileInput.addEventListener('change', changeFileMockedFn)
+      userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
+      expect(changeFileMockedFn).toHaveBeenCalled()
+      const error = "Erreur 401"
+      await waitFor(() => expect(console.error).toBeCalledWith(error))
+    })
+
+    // 403 (Forbidden)
+    test("Then an API call failing with a 403 error should console.error a 403 error message", async () => {
+      mockStore.bills = jest.fn(mockStore.bills)
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          create : () =>  {
+            return Promise.reject("Erreur 403")
+          }
+      }})
+      InitNewBillviaOnNavigate()
+      const fileInput = screen.getByTestId('file')
+      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+      fileInput.addEventListener('change', changeFileMockedFn)
+      userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
+      expect(changeFileMockedFn).toHaveBeenCalled()
+      const error = "Erreur 403"
+      await waitFor(() => expect(console.error).toBeCalledWith(error))
+    })
+
   })
 })
-
-//['500', '401', '400', '403', '412'].forEach(error => {
-  //})
