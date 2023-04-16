@@ -73,31 +73,34 @@ describe("Given I am connected as an employee", () => {
 
     beforeEach(()=>{ InitWithANewBillInstance() })
 
-    test("Then selecting a valid file should push the expected values to .billid and to the file input's files array", async () => {
+    test("Then adding a valid file to the form should push the expected values to container.billid / fileInput.files[0].name", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         const fileInput = screen.getByTestId('file')
         const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
         fileInput.addEventListener('change', changeFileMockedFn)
-        userEvent.upload(fileInput, new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'}))
+        userEvent.upload(fileInput, new File(['(㇏(•̀ᵥᵥ•́)ノ)'], 'dracula.png', {type: 'image/png'}))
         // fireEvent.change(fileInput, { target: { files: [new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'})], }, })
         expect(changeFileMockedFn).toHaveBeenCalled()
         // billId = "1234" when handlechangefile is successful
         // due to mocked store : create(bill) { return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'}) },
         await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
-        expect(fileInput.files[0].name).toBe("chucknorris.png")
+        expect(fileInput.files[0].name).toBe("dracula.png")
     })
 
     test("Then the submit button should trigger a form subsmission", async () => {
+        // wait for the UI to populate the DOM
         await waitFor(() => screen.getByTestId('form-new-bill'))
-        // better process but still buggy
         const fileInput = screen.getByTestId('file')
-        userEvent.upload(fileInput, new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'}))
+        // add a file to the form
+        userEvent.upload(fileInput, new File(['(㇏(•̀ᵥᵥ•́)ノ)'], 'dracula.png', {type: 'image/png'}))
         await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
+        // when done, deal with submission triggering
         const formNewBill = screen.getByTestId('form-new-bill')
         const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
         formNewBill.addEventListener('submit', clickSubmitNewBillMockedFn)
         const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
         userEvent.click(sendNewBillBtn)
+        // check if handlesubmit has been called after submission
         expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
     })
 
