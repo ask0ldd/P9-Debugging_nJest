@@ -34,8 +34,7 @@ function InitBillviaOnNavigate() {
 
 function InitWithABillInstance() { 
   // onNavigate is a fn passed to every containers
-  // so that they can force programmatically the navigation to other pages
-  // not needed here
+  // so that they can force the navigation to any other pages
   // we need to instanciate the bill container to accces its methods for our test
   document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
   billContainer = new Bills({ document, onNavigate : jest.fn, store: null, bills:bills, localStorage: window.localStorage })
@@ -74,24 +73,21 @@ describe("Given I am connected as an employee", () => {
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({ pathname })
         }
-        // we need to instanciate the bill container to accces its methods for our test
+        // instanciate the bill container to accces its methods for our test
         document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
         const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
-        
-        const handleClickNewBillMockFn = jest.fn(billContainer.handleClickNewBill)
+        // wait for the UI to populate the DOM
         await waitFor(() => screen.getByTestId('btn-new-bill'))
-
+        // setup to monitor a click of the "new bill" button
+        const handleClickNewBillMockFn = jest.fn(billContainer.handleClickNewBill)
         const newBillBtn = screen.getByTestId('btn-new-bill')
         newBillBtn.addEventListener('click', handleClickNewBillMockFn)
         userEvent.click(newBillBtn)
-
-        // unit test ?
+        // has the function linked to the button been called ?
         expect(handleClickNewBillMockFn).toHaveBeenCalled()
-
-        // integration test?
         await waitFor(() => screen.getByTestId('form-new-bill'))
+        // is the form being displayed ?
         expect(screen.getByTestId("form-new-bill")).toBeInTheDocument()
-
     })
 
     // * UNIT TEST / icon eye button click / UI : employee dashboard / container/bill.js coverage line 23
@@ -103,7 +99,7 @@ describe("Given I am connected as an employee", () => {
         const iconEyeBtn = screen.getAllByTestId('icon-eye')[0]
         const handleClickIconEyeMockFn = jest.fn((e) => billContainer.handleClickIconEye(iconEyeBtn))
         iconEyeBtn.addEventListener('click', handleClickIconEyeMockFn)
-        $.fn.modal = jest.fn() // mock bootstrap modale fn to avoid any error
+        $.fn.modal = jest.fn(() => {}) // mock bootstrap modale fn to avoid any error
         userEvent.click(iconEyeBtn)
 
         expect(handleClickIconEyeMockFn).toHaveBeenCalled()
