@@ -177,7 +177,7 @@ describe("Given I am connected as an employee", () => {
       expect(screen.getAllByTestId('icon-eye').length).toBe(4)
     })
 
-    test("404 error", async () => {
+    test("Then an API call resulting in 404 error should display a 404 error message", async () => {
       // jest.spyOn(mockStore, "bills")
       mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
@@ -190,7 +190,7 @@ describe("Given I am connected as an employee", () => {
       expect(await waitFor(() => screen.getByText(/Erreur 404/))).toBeInTheDocument()
     })
 
-    test("500 error", async () => {
+    test("Then an API call resulting in 500 error should display a 500 error message", async () => {
       mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {
