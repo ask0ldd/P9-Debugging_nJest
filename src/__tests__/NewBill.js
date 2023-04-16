@@ -73,12 +73,41 @@ describe("Given I am connected as an employee", () => {
 
     beforeEach(()=>{ InitWithANewBillInstance() })
 
-    test("Then adding a valid file to the form should push the expected values to container.billid / fileInput.files[0].name", async () => {
+    test("Then the submit button is triggering a form subsmission", async () => {
+      // wait for the UI to populate the DOM
+      await waitFor(() => screen.getByTestId('form-new-bill'))
+      const fileInput = screen.getByTestId('file')
+      // add a file to the form
+      userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
+      await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
+      // when done, deal with submission triggering
+      const formNewBill = screen.getByTestId('form-new-bill')
+      const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
+      formNewBill.addEventListener('submit', clickSubmitNewBillMockedFn)
+      const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
+      userEvent.click(sendNewBillBtn)
+      // check if handlesubmit has been called after submission
+      expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
+    })
+
+    test("Then an invalid file can't be successfully added to the form", async () => {
+      await waitFor(() => screen.getByTestId('form-new-bill'))
+      const fileInput = screen.getByTestId('file')
+      const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
+      // const event = { preventDefault: () => {}, target:{ value : 'https://localhost:3456/images/test.zzz', files:{ 0 : file}}}
+      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+      fileInput.addEventListener('change', () => changeFileMockedFn) // for integration test
+      userEvent.upload(fileInput, file)
+      expect(fileInput.value).toBe("")
+      expect(fileInput.files).toStrictEqual([])
+    })
+
+    test("Then a valid file can be successfully added to the form", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         const fileInput = screen.getByTestId('file')
         const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
         fileInput.addEventListener('change', changeFileMockedFn)
-        userEvent.upload(fileInput, new File(['(㇏(•̀ᵥᵥ•́)ノ)'], 'dracula.png', {type: 'image/png'}))
+        userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
         // fireEvent.change(fileInput, { target: { files: [new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'})], }, })
         expect(changeFileMockedFn).toHaveBeenCalled()
         // billId = "1234" when handlechangefile is successful
@@ -87,24 +116,7 @@ describe("Given I am connected as an employee", () => {
         expect(fileInput.files[0].name).toBe("dracula.png")
     })
 
-    test("Then the submit button should trigger a form subsmission", async () => {
-        // wait for the UI to populate the DOM
-        await waitFor(() => screen.getByTestId('form-new-bill'))
-        const fileInput = screen.getByTestId('file')
-        // add a file to the form
-        userEvent.upload(fileInput, new File(['(㇏(•̀ᵥᵥ•́)ノ)'], 'dracula.png', {type: 'image/png'}))
-        await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
-        // when done, deal with submission triggering
-        const formNewBill = screen.getByTestId('form-new-bill')
-        const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
-        formNewBill.addEventListener('submit', clickSubmitNewBillMockedFn)
-        const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
-        userEvent.click(sendNewBillBtn)
-        // check if handlesubmit has been called after submission
-        expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
-    })
-
-    test("then an error should be thrown when an invalid file is submitted with the form", async () => {
+    test("then an alert should be triggered when an invalid file is submitted with the form", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.zzz"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.zzz"
@@ -136,31 +148,6 @@ describe("Given I am connected as an employee", () => {
       userEvent.click(sendNewBillBtn)
       expect(newBillContainer.updateBill).toHaveBeenCalled()
     })
-
-  })
-})
-
-// UNIT TEST
-describe("Given I am connected as an employee", () => {
-  describe("When I am on NewBill Page", () => {
-
-    beforeEach(()=>{ 
-      InitWithANewBillInstance() 
-    })
-
-    test("Then the file input should reject any invalid file", async () => {
-      await waitFor(() => screen.getByTestId('form-new-bill'))
-      const fileInput = screen.getByTestId('file')
-      const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
-      // const event = { preventDefault: () => {}, target:{ value : 'https://localhost:3456/images/test.zzz', files:{ 0 : file}}}
-      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
-      fileInput.addEventListener('change', () => changeFileMockedFn) // for integration test
-      userEvent.upload(fileInput, file)
-      expect(fileInput.value).toBe("")
-      expect(fileInput.files).toStrictEqual([])
-      //expect(() => changeFileMockedFn(event)).toThrow("Type de fichier invalide.")
-    })
-
 
   })
 })
