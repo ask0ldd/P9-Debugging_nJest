@@ -110,9 +110,12 @@ describe("Given I am connected as an employee", () => {
         const formNewBill = screen.getByTestId('form-new-bill')
         const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
         formNewBill.addEventListener('submit', () => clickSubmitNewBillMockedFn(event))
-        // https://github.com/testing-library/react-testing-library/issues/624
-        // no way with jest to catch the error via the triggering of the submit event
-        // expect(() => clickSubmitNewBillMockedFn(event)).toThrow("Type de fichier invalide.")
+        const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
+        jest.spyOn(window, 'alert').mockImplementation(() => {})
+        userEvent.click(sendNewBillBtn)
+        expect(window.alert).toBeCalledWith("Type de fichier invalide.")
+        // Note : https://github.com/testing-library/react-testing-library/issues/624
+        // = no way for jest to catch an error thrown through the triggering of an event
     })
 
     test("then the API should be called when a valid form is submitted", async () => {
