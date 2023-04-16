@@ -160,7 +160,7 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-// integration test : GET from API
+// integration test : interactions GET request to API > Bills > BillsUI
 
 jest.mock("../app/store", () => mockStore)
 

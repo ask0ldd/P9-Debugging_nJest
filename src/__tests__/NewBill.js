@@ -2,13 +2,13 @@
  * @jest-environment jsdom
  */
 
-import { fireEvent ,screen, waitFor } from "@testing-library/dom"
+import { screen, waitFor } from "@testing-library/dom"
 import '@testing-library/jest-dom' // .toBeInTheDocument() matcher
 import userEvent from '@testing-library/user-event'
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
-import store from "../__mocks__/store.js";
+import mockStore from "../__mocks__/store.js";
 import { bills } from "../fixtures/bills.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import router from "../app/Router.js";
@@ -31,7 +31,7 @@ function InitNewBillviaOnNavigate() {
 // NewBillsUI alone + instanciation of newbill container > access to the related methods
 function InitWithANewBillInstance() {
   document.body.innerHTML = NewBillUI()
-  newBillContainer = new NewBill({ document, onNavigate : jest.fn, store: {...store}, localStorage: window.localStorage })
+  newBillContainer = new NewBill({ document, onNavigate : jest.fn, store: {...mockStore}, localStorage: window.localStorage })
 }
 
 function fillForm(){
@@ -110,10 +110,11 @@ describe("Given I am connected as an employee", () => {
         userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
         // fireEvent.change(fileInput, { target: { files: [new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'})], }, })
         expect(changeFileMockedFn).toHaveBeenCalled()
-        // billId = "1234" when handlechangefile is successful
+        // POST request happens in handlechangefile
         // due to mocked store : create(bill) { return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'}) },
         await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
-        expect(fileInput.files[0].name).toBe("dracula.png")
+        expect(newBillContainer.fileUrl).toBe('https://localhost:3456/images/test.jpg')
+        expect(newBillContainer.fileName).toBe("dracula.png")
     })
 
     test("then an alert should be triggered when an invalid file is submitted with the form", async () => {
@@ -151,3 +152,54 @@ describe("Given I am connected as an employee", () => {
 
   })
 })
+
+// 201 created / 400 (Bad Request) / 401 (Unauthorized) / 403 (Forbidden) / 412 (Precondition Failed) / 500 (Internal Server Error)
+
+// integration test : interactions POST
+
+jest.mock("../app/store", () => mockStore)
+
+describe("Given I am connected as an employee", () => {
+  describe("When I am on the Bills Page", () => {
+
+    beforeAll(()=>{ 
+      jest.spyOn(console, "error") 
+    })
+
+    test("Then a succesfull POST", async () => {
+      InitWithANewBillInstance()
+      await waitFor(() => screen.getByTestId('form-new-bill'))
+      const fileInput = screen.getByTestId('file')
+      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+      fileInput.addEventListener('change', changeFileMockedFn)
+      userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
+      expect(changeFileMockedFn).toHaveBeenCalled()
+      // those values are expected to be returned when the POST request to the mockedStore is successfull
+      await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
+      expect(newBillContainer.fileUrl).toBe('https://localhost:3456/images/test.jpg')
+      expect(newBillContainer.fileName).toBe("dracula.png")
+    })
+
+    
+        test("Then an API call failing with a 500 error should console.error 500 error message", async () => {
+          mockStore.bills = jest.fn(mockStore.bills)
+          mockStore.bills.mockImplementationOnce(() => {
+            return {
+              create : () =>  {
+                return Promise.reject("Erreur 500")
+              }
+          }})
+          InitNewBillviaOnNavigate()
+          const fileInput = screen.getByTestId('file')
+          const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+          fileInput.addEventListener('change', changeFileMockedFn)
+          userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
+          expect(changeFileMockedFn).toHaveBeenCalled()
+          const error = "Erreur 500"
+          await waitFor(() => expect(console.error).toBeCalledWith(error))
+        })
+  })
+})
+
+//['500', '401', '400', '403', '412'].forEach(error => {
+  //})
