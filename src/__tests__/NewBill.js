@@ -9,8 +9,7 @@ import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import { localStorageMock } from "../__mocks__/localStorage.js"
 import mockStore from "../__mocks__/store.js";
-import { bills } from "../fixtures/bills.js"
-import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
+import { ROUTES_PATH } from "../constants/routes.js";
 import router from "../app/Router.js";
 
 const fs = require('fs')
@@ -215,8 +214,8 @@ describe("Given I am connected as an employee", () => {
       fileInput.addEventListener('change', changeFileMockedFn)
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       expect(changeFileMockedFn).toHaveBeenCalled()
-      const error = "Erreur 400"
-      await waitFor(() => expect(console.error).toBeCalledWith(error))
+      const expectedError = "Erreur 400"
+      await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
 
     // 401 (Unauthorized)
@@ -234,8 +233,8 @@ describe("Given I am connected as an employee", () => {
       fileInput.addEventListener('change', changeFileMockedFn)
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       expect(changeFileMockedFn).toHaveBeenCalled()
-      const error = "Erreur 401"
-      await waitFor(() => expect(console.error).toBeCalledWith(error))
+      const expectedError = "Erreur 401"
+      await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
 
     // 403 (Forbidden)
@@ -253,8 +252,8 @@ describe("Given I am connected as an employee", () => {
       fileInput.addEventListener('change', changeFileMockedFn)
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       expect(changeFileMockedFn).toHaveBeenCalled()
-      const error = "Erreur 403"
-      await waitFor(() => expect(console.error).toBeCalledWith(error))
+      const expectedError = "Erreur 403"
+      await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
 
   })
