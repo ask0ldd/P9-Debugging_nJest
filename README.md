@@ -17,4 +17,4 @@ It wasn't an easy task since I did my best to stick to the user workflow (which 
 
 One of the most interesting test has to be that one :
 
-<img src="carbon.png">
+<img src="carbon2.png">
