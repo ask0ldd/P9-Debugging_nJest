@@ -161,7 +161,9 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on the Bills Page", () => {
 
     beforeAll(()=>{ 
-      jest.spyOn(console, "error") 
+      // jest.spyOn(console, "error")
+      // console.error.mockImplementationOnce(() => { })
+      console.error = jest.fn(() => {})
     })
 
     // 201 (Success)
@@ -185,7 +187,7 @@ describe("Given I am connected as an employee", () => {
       mockStore.bills.mockImplementationOnce(() => {
         return {
           create : () =>  {
-            return Promise.reject("Erreur 500")
+            return Promise.reject(new Error("Erreur 500"))
           }
         }
       })
@@ -195,7 +197,7 @@ describe("Given I am connected as an employee", () => {
       fileInput.addEventListener('change', changeFileMockedFn)
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       expect(changeFileMockedFn).toHaveBeenCalled()
-      const expectedError = "Erreur 500"
+      const expectedError = new Error("Erreur 500")
       await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
 
@@ -205,7 +207,7 @@ describe("Given I am connected as an employee", () => {
       mockStore.bills.mockImplementationOnce(() => {
         return {
           create : () =>  {
-            return Promise.reject("Erreur 400")
+            return Promise.reject(new Error("Erreur 400"))
           }
       }})
       InitNewBillviaOnNavigate()
@@ -214,7 +216,7 @@ describe("Given I am connected as an employee", () => {
       fileInput.addEventListener('change', changeFileMockedFn)
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       expect(changeFileMockedFn).toHaveBeenCalled()
-      const expectedError = "Erreur 400"
+      const expectedError = new Error("Erreur 400")
       await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
 
@@ -224,7 +226,7 @@ describe("Given I am connected as an employee", () => {
       mockStore.bills.mockImplementationOnce(() => {
         return {
           create : () =>  {
-            return Promise.reject("Erreur 401")
+            return Promise.reject(new Error("Erreur 401"))
           }
       }})
       InitNewBillviaOnNavigate()
@@ -233,7 +235,7 @@ describe("Given I am connected as an employee", () => {
       fileInput.addEventListener('change', changeFileMockedFn)
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       expect(changeFileMockedFn).toHaveBeenCalled()
-      const expectedError = "Erreur 401"
+      const expectedError = new Error("Erreur 401")
       await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
 
@@ -243,7 +245,7 @@ describe("Given I am connected as an employee", () => {
       mockStore.bills.mockImplementationOnce(() => {
         return {
           create : () =>  {
-            return Promise.reject("Erreur 403")
+            return Promise.reject(new Error("Erreur 403"))
           }
       }})
       InitNewBillviaOnNavigate()
@@ -252,7 +254,7 @@ describe("Given I am connected as an employee", () => {
       fileInput.addEventListener('change', changeFileMockedFn)
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       expect(changeFileMockedFn).toHaveBeenCalled()
-      const expectedError = "Erreur 403"
+      const expectedError = new Error("Erreur 403")
       await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
 
