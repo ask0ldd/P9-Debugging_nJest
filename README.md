@@ -17,31 +17,31 @@ It wasn't an easy task since I did my best to stick to the user workflow (which 
 
 One of the most interesting test has to be that one :
 
-// mocking the API
-jest.mock("../app/store", () => mockStore)
-
-// silencing console.error
-beforeAll(()=>{
-console.error = jest.fn(() => {})
-})
-
-test("An API call leading to a thrown 403 error should lead to such an error being printed to the console", async () => {
-mockStore.bills = jest.fn(mockStore.bills)
-// next bills method call will be overridden to simulate a 403 error reply
-mockStore.bills.mockImplementationOnce(() => {
-return {
-create : () => {
-return Promise.reject(new Error("Erreur 403"))
-}
-}})
-InitNewBillviaOnNavigate()
-const fileInput = screen.getByTestId('file')
-const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
-fileInput.addEventListener('change', changeFileMockedFn)
-// associating a file with the dedicated form input > which triggers the API POST request
-userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
-expect(changeFileMockedFn).toHaveBeenCalled()
-const expectedError = new Error("Erreur 403")
-// we expect console.error to be called with an instance of the error obj
-await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
+// mocking the API<br>
+jest.mock("../app/store", () => mockStore)<br>
+<br>
+// silencing console.error<br>
+beforeAll(()=>{<br>
+console.error = jest.fn(() => {})<br>
+})<br>
+<br>
+test("An API call leading to a thrown 403 error should lead to such an error being printed to the console", async () => {<br>
+mockStore.bills = jest.fn(mockStore.bills)<br>
+// next bills method call will be overridden to simulate a 403 error reply<br>
+mockStore.bills.mockImplementationOnce(() => {<br>
+return {<br>
+create : () => {<br>
+return Promise.reject(new Error("Erreur 403"))<br>
+}<br>
+}})<br>
+InitNewBillviaOnNavigate()<br>
+const fileInput = screen.getByTestId('file')<br>
+const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)<br>
+fileInput.addEventListener('change', changeFileMockedFn)<br>
+// associating a file with the dedicated form input > which triggers the API POST request<br>
+userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))<br>
+expect(changeFileMockedFn).toHaveBeenCalled()<br>
+const expectedError = new Error("Erreur 403")<br>
+// we expect console.error to be called with an instance of the error obj<br>
+await waitFor(() => expect(console.error).toBeCalledWith(expectedError))<br>
 })
