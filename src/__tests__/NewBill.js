@@ -152,7 +152,7 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-// integration test : interactions POST
+// INTEGRATION TESTS : interactions POST
 jest.mock("../app/store", () => mockStore)
 
 describe("Given I am connected as an employee", () => {

@@ -75,7 +75,7 @@ describe("Given I am connected as an employee", () => {
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({ pathname })
         }
-        // instanciate the bill container to accces its methods for our test
+        // instanciate the bill container so we can access its handleClickNewBill method
         document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
         const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
         // wait for the UI to populate the DOM
@@ -101,7 +101,7 @@ describe("Given I am connected as an employee", () => {
         const iconEyeBtn = screen.getAllByTestId('icon-eye')[0]
         const handleClickIconEyeMockFn = jest.fn((e) => billContainer.handleClickIconEye(iconEyeBtn))
         iconEyeBtn.addEventListener('click', handleClickIconEyeMockFn)
-        $.fn.modal = jest.fn(() => {}) // mock bootstrap modale fn to avoid any error
+        $.fn.modal = jest.fn(() => {}) // empty mock bootstrap modal fn to avoid any error
         userEvent.click(iconEyeBtn)
 
         expect(handleClickIconEyeMockFn).toHaveBeenCalled()
@@ -120,6 +120,7 @@ describe("Given I am connected as an employee", () => {
     })
 
     // * UNIT TEST / we need to test how the bill container handle an invalid date / UI : employee dashboard / container/bill.js coverage line 30
+    // 1 date invalide + 1 date valide pour verifier que seules les dates invalides ont ce traitement ?
     test("then passing a mocked store containing one invalid date should lead to an invalid date being displayed into the bills table", async () => { 
 
       const mockedBill = {
@@ -151,7 +152,7 @@ describe("Given I am connected as an employee", () => {
       // unit test ?
       expect((await billContainer.getBills())[0].date).toBe('xxxx/xx/xx')
       
-      // integration test
+      // integration test ?
       document.body.innerHTML = BillsUI({data : await billContainer.getBills()})
       await waitFor(() => screen.getAllByTestId('icon-eye'))
       expect(screen.getByText('xxxx/xx/xx')).toBeInTheDocument()
@@ -160,7 +161,7 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-// integration test : interactions GET request to API > Bills > BillsUI
+// INTEGRATION TESTS : interactions GET request to API > Bills > BillsUI
 
 jest.mock("../app/store", () => mockStore)
 
@@ -177,7 +178,7 @@ describe("Given I am connected as an employee", () => {
       expect(screen.getAllByTestId('icon-eye').length).toBe(4)
     })
 
-    test("Then an API call resulting in 404 error should display a 404 error message", async () => {
+    test("Then an API call returning a 404 error should display a 404 error message", async () => {
       // jest.spyOn(mockStore, "bills")
       mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
@@ -190,7 +191,7 @@ describe("Given I am connected as an employee", () => {
       expect(await waitFor(() => screen.getByText(/Erreur 404/))).toBeInTheDocument()
     })
 
-    test("Then an API call resulting in 500 error should display a 500 error message", async () => {
+    test("Then an API call returning a 500 error should display a 500 error message", async () => {
       mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {
