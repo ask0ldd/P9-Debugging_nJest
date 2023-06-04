@@ -51,13 +51,19 @@ describe("Given I am connected as an employee", () => {
 
     beforeAll(() => InitNewBillviaOnNavigate())
 
-    // * UNIT TEST / when connected as an  / UI : employee dashboard / container/bill.js coverage line 30
+    // * UNIT TEST : the form and the named input should be present on the newbill page
+    // * UI : employee newBill page 
+    // * COVERAGE : container/newBill.js => line 4-16
     test("Then the page and its form should be displayed", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         expect(screen.getByTestId('form-new-bill')).toBeInTheDocument()
         expect(document.body.querySelector('#btn-send-bill')).toBeInTheDocument()
+        // add other form elements checking
     })
 
+    // * UNIT TEST : the mail icon should be the active icon into the nav bar
+    // * UI : employee newBill page 
+    // * COVERAGE : container/newBill.js
     test("Then the mail icon in the vertical layout should be the only one highlighted", async () => {
         await waitFor(() => screen.getByTestId('icon-mail'))
         const mailIcon = screen.getByTestId('icon-mail')
@@ -72,7 +78,10 @@ describe("Given I am connected as an employee", () => {
 
     beforeEach(()=>{ InitWithANewBillInstance() })
 
-    test("Then the submit button is triggering a form subsmission", async () => {
+    // * UNIT TEST : The submit button should trigger a form submission
+    // * UI : employee newBill page 
+    // * COVERAGE : container/newBill.js => line 56-82
+    test("Then the submit button should trigger a form submission", async () => {
       // wait for the UI to populate the DOM
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
@@ -89,6 +98,10 @@ describe("Given I am connected as an employee", () => {
       expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
     })
 
+
+    // * UNIT TEST : An invalid file shouldn't be added to the form
+    // * UI : employee newBill page 
+    // * COVERAGE : container/newBill.js => line 20-29
     test("Then an invalid file can't be successfully added to the form", async () => {
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
@@ -101,6 +114,9 @@ describe("Given I am connected as an employee", () => {
       expect(fileInput.files).toStrictEqual([])
     })
 
+    // * UNIT TEST : A valid file should be added to the form and receive the expected response when sent to the mocked store
+    // * UI : employee newBill page 
+    // * COVERAGE : container/newBill.js => line 20-51
     test("Then a valid file can be successfully added to the form", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         const fileInput = screen.getByTestId('file')
@@ -139,6 +155,7 @@ describe("Given I am connected as an employee", () => {
       newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"
       // const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
       fillForm()
+      // defining a custom event to be passed to handleSubmit
       const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
       const formNewBill = screen.getByTestId('form-new-bill')
       const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)

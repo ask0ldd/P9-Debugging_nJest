@@ -57,7 +57,7 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getByTestId('icon-mail').classList.contains("active-icon")).toBeFalsy()
         //
     })
-    
+
 
     test("Then all the bills tickets should be ordered from the latest to the earliest", () => {
         document.body.innerHTML = BillsUI({ data: bills })
@@ -127,8 +127,10 @@ describe("Given I am connected as an employee", () => {
       expect(new Set(await billContainer.getBills()).forEach(bill => bill.date = "")).toEqual(new Set(bills).forEach(bill => bill.date = ""))
     })
 
-    // * UNIT TEST / we need to test how the bill container handle an invalid date / UI : employee dashboard / container/bill.js coverage line 30
-    // 1 date invalide + 1 date valide pour verifier que seules les dates invalides ont ce traitement ?
+
+    // * UNIT TEST : can the billContainer deal with an invalid date within some bills?
+    // * UI : employee bills page 
+    // * COVERAGE : container/bill.js => The catch statement that wasn't tested through the previous test
     test("then passing a mocked store containing one invalid date should lead to an invalid date being displayed into the bills table", async () => { 
 
       const mockedBill = {
@@ -155,12 +157,12 @@ describe("Given I am connected as an employee", () => {
         return {...mockedBill}
       },}
 
-      const billContainer = new Bills({ document, onNavigate : jest.fn, store: mockedStore, localStorage: window.localStorage }) // passing the mocked store instead of bills
+      // passing the mocked store instead of the mocked bills
+      const billContainer = new Bills({ document, onNavigate : jest.fn, store: mockedStore, localStorage: window.localStorage })
 
-      // unit test ?
       expect((await billContainer.getBills())[0].date).toBe('xxxx/xx/xx')
       
-      // integration test ?
+      // !!! integration test ?
       document.body.innerHTML = BillsUI({data : await billContainer.getBills()})
       await waitFor(() => screen.getAllByTestId('icon-eye'))
       expect(screen.getByText('xxxx/xx/xx')).toBeInTheDocument()
@@ -169,9 +171,10 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
+
 // INTEGRATION TESTS : interactions GET request to API > Bills > BillsUI
 
-jest.mock("../app/store", () => mockStore)
+jest.mock("../app/Store", () => mockStore)
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on the Bills Page", () => {
