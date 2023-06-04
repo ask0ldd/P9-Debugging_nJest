@@ -12,7 +12,7 @@ export default () => {
         <div class="form-newbill-container content-inner">
           <form data-testid="form-new-bill">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 pad6rem">
                   <div class="col-half">
                     <label for="expense-type" class="bold-label">Type de dépense</label>
                       <select required class="form-control blue-border" data-testid="expense-type">
@@ -60,7 +60,7 @@ export default () => {
                 </div>
             </div>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-6 pad6rem">
                 <div class="col-half">
                   <button type="submit" id='btn-send-bill' class="btn btn-primary">Envoyer</button>
                 </div>

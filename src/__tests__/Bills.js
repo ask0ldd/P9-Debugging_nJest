@@ -108,7 +108,7 @@ describe("Given I am connected as an employee", () => {
         expect($.fn.modal).toHaveBeenCalledWith('show') 
     })
 
-    // * UNIT TEST / check if mockeStore bills (>IN) = container.getBills() bills (OUT>) / UI : employee dashboard / container/bill.js coverage line 30
+    // * UNIT TEST / check if mockedStore bills (>IN) = container.getBills() bills (OUT>) / UI : employee dashboard / container/bill.js coverage line 30
     // function called into app/router.js
     test("then passing our mockedStore to the bills container should lead to .getbills() returning an array of 4 elements", async () => { 
       const billContainer = new Bills({ document, onNavigate : jest.fn, store: {...mockStore}, localStorage: window.localStorage }) // passing the mocked store instead of bills
@@ -116,7 +116,7 @@ describe("Given I am connected as an employee", () => {
       // 4 bills IN : the mocked store, 4 bills OUT of getbills
       expect((await billContainer.getBills()).length).toBe(4)
       // besides the date property bills IN should be equal to bills OUT
-      expect(new Set(await billContainer.getBills()).forEach(bill => bill.date = "")).toEqual(new Set(bills).forEach(bill => bill.date = "")) // Set because differents bills order between IN & OUT
+      expect(new Set(await billContainer.getBills()).forEach(bill => bill.date = "")).toEqual(new Set(bills).forEach(bill => bill.date = "")) // Set because differents bills order between IN & OUT / Acceptable since number of bills tested right before
     })
 
     // * UNIT TEST / we need to test how the bill container handle an invalid date / UI : employee dashboard / container/bill.js coverage line 30
