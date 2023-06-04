@@ -47,7 +47,6 @@ function InitWithABillInstance() {
 describe("Given I am connected as an employee", () => {
   describe("When I am on the Bills Page", () => {
     test("Then the window icon in the vertical nav bar should be the only one highlighted", async () => {
-
         InitBillviaOnNavigate()
         await waitFor(() => screen.getByTestId('icon-window'))
         const windowIcon = screen.getByTestId('icon-window')
@@ -58,23 +57,22 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getByTestId('icon-mail').classList.contains("active-icon")).toBeFalsy()
         //
     })
+    
 
     test("Then all the bills tickets should be ordered from the latest to the earliest", () => {
-
         document.body.innerHTML = BillsUI({ data: bills })
         const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
         const antiChrono = (a, b) => ((a < b) ? 1 : -1)
         const datesSorted = [...dates].sort(antiChrono)
         expect(dates).toEqual(datesSorted)
-
     })
+
     
     // * UNIT TEST : clicking the "new bill" button
-    // * UI : bills & newBills 
-    // * COVERAGE : bill.js Container => Lines : 19-21
+    // * UI : employee bills page & newBills page
+    // * COVERAGE : container/bill.js => Lines : 19-21
     // async to have access to the waitFor fn
     test("then clicking on the 'new bill' button should display the 'new bill' form", async () => { 
-
         // onNavigate necessary on this specific test since there is a programmatic navigation from BillsUI to NewBillUI
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({ pathname })
@@ -82,7 +80,6 @@ describe("Given I am connected as an employee", () => {
         // instanciate the bill container to get access to the handleClickNewBill method
         document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
         const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
-
         // wait for the UI to populate the vDOM
         await waitFor(() => screen.getByTestId('btn-new-bill'))
         // setup to monitor any left click of the "new bill" button
@@ -96,15 +93,14 @@ describe("Given I am connected as an employee", () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         // is the form being displayed ?
         expect(screen.getByTestId("form-new-bill")).toBeInTheDocument()
-
     })
 
+
     // * UNIT TEST : clicking the "icon eye" button 
-    // * UI : bills
-    // * COVERAGE : bill.js Container => Lines : 23-27
+    // * UI : employee bills page
+    // * COVERAGE : container/bill.js => Lines : 23-27
     test("then clicking on the icon eye button should open a modale", async () => { 
         InitWithABillInstance()
-        
         await waitFor(() => screen.getAllByTestId('icon-eye'))
         // select the first "icon eye" button
         const iconEyeBtn = screen.getAllByTestId('icon-eye')[0]
@@ -112,20 +108,23 @@ describe("Given I am connected as an employee", () => {
         iconEyeBtn.addEventListener('click', handleClickIconEyeMockFn)
         $.fn.modal = jest.fn(() => {}) // empty mock bootstrap modal fn to avoid any error
         userEvent.click(iconEyeBtn)
-
         expect(handleClickIconEyeMockFn).toHaveBeenCalled()
         expect($.fn.modal).toHaveBeenCalledWith('show') 
     })
 
-    // * UNIT TEST / check if mockedStore bills (>IN) = container.getBills() bills (OUT>) / UI : employee dashboard / container/bill.js coverage line 30
+
+    // * UNIT TEST : checking if billsContainer.getBills() can process some mockedStore bills with no alteration
+    // * UI : employee bills page
+    // * COVERAGE : container/bill.js => Lines 30-56 minus the catch statement
     // function called into app/router.js
-    test("then passing our mockedStore to the bills container should lead to .getbills() returning an array of 4 elements", async () => { 
-      const billContainer = new Bills({ document, onNavigate : jest.fn, store: {...mockStore}, localStorage: window.localStorage }) // passing the mocked store instead of bills
-      
-      // 4 bills IN : the mocked store, 4 bills OUT of getbills
+    test("then passing our mockedStore to the bills container should lead to .getbills() returning an array of 4 expected elements", async () => { 
+      // passing the mocked store instead of bills
+      const billContainer = new Bills({ document, onNavigate : jest.fn, store: {...mockStore}, localStorage: window.localStorage }) 
+      // 4 bills IN : MockedStore vs 4 bills OUT : billContainer.getbills()
       expect((await billContainer.getBills()).length).toBe(4)
       // besides the date property bills IN should be equal to bills OUT
-      expect(new Set(await billContainer.getBills()).forEach(bill => bill.date = "")).toEqual(new Set(bills).forEach(bill => bill.date = "")) // Set because differents bills order between IN & OUT / Acceptable since number of bills tested right before
+      // Set because IN & OUT bills are ordered in a different way => Number of bills tested right before, so no risk of getting rid of a duplicate bill
+      expect(new Set(await billContainer.getBills()).forEach(bill => bill.date = "")).toEqual(new Set(bills).forEach(bill => bill.date = ""))
     })
 
     // * UNIT TEST / we need to test how the bill container handle an invalid date / UI : employee dashboard / container/bill.js coverage line 30
