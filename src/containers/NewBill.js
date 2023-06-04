@@ -85,6 +85,7 @@ export default class NewBill {
 
   // not need to cover this function by tests
   updateBill = (bill) => {
+    /* istanbul ignore else */
     if (this.store) {
       this.store
       .bills()

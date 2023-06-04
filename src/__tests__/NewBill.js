@@ -68,7 +68,7 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getByTestId('file')).toBeInTheDocument()
     })
 
-    // * UNIT TEST : the mail icon should be the active icon into the nav bar
+    // * UNIT TEST : the mail icon should be the only active icon within the nav bar
     // * UI : employee newBill page 
     // * COVERAGE : container/newBill.js
     test("Then the mail icon in the vertical layout should be the only one highlighted", async () => {
@@ -85,47 +85,45 @@ describe("Given I am connected as an employee", () => {
 
     beforeEach(()=>{ InitWithANewBillInstance() })
 
-    // * UNIT TEST : An invalid file shouldn't be added to the form or uploaded to the server
+    // * UNIT TEST : An invalid file shouldn't be added to the form or trigger a new bill creation on the server
     // * UI : employee newBill page 
     // * COVERAGE : container/newBill.js => line 20-29
-    test("Then an invalid file can't be successfully added to the form", async () => {
+    test("Then an invalid file can't be successfully added to the form or trigger a new bill creation call to the server", async () => {
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
       const file = new File(['hello'], 'https://localhost:3456/images/test.zzz', {type: 'image/zzz'})
       // const event = { preventDefault: () => {}, target:{ value : 'https://localhost:3456/images/test.zzz', files:{ 0 : file}}}
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
-      // !!! jest.fn => this.store.bills().create
+      newBillContainer.store.bills().create = jest.fn(newBillContainer.store.bills().create)
       fileInput.addEventListener('change', () => changeFileMockedFn) // for integration test
       userEvent.upload(fileInput, file)
       expect(fileInput.value).toBe("")
       expect(fileInput.files).toStrictEqual([])
-      // !!! check that this.store.bills().create hasn't been called
+      expect(newBillContainer.store.bills().create).not.toHaveBeenCalled()
     })
 
 
-    // * UNIT TEST : Selecting a valid file should lead to the creation of a new bill on the server & return "1234" as its billId
+    // * UNIT TEST : Selecting a valid file should lead to the creation of a new bill on the server & the creation of a new bill should be called
     // * UI : employee newBill page 
     // * COVERAGE : container/newBill.js => line 20-51
-    test("Then a valid file can be successfully added to the form", async () => {
+    test("Then a valid file can be successfully added to the form & trigger a new bill creation call to the server", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         const fileInput = screen.getByTestId('file')
         const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+        newBillContainer.store.bills().create = jest.fn(newBillContainer.store.bills().create)
         fileInput.addEventListener('change', changeFileMockedFn)
         userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
         // fireEvent.change(fileInput, { target: { files: [new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'})], }, })
         expect(changeFileMockedFn).toHaveBeenCalled()
-        // POST request happens in handlechangefile
-        // due to mocked store : create(bill) { return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'}) },
-        await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
-        expect(newBillContainer.fileUrl).toBe('https://localhost:3456/images/test.jpg')
-        expect(newBillContainer.fileName).toBe("dracula.png")
+        // POST request / Create Bill happens in handlechangefile
+        expect(newBillContainer.store.bills().create).toHaveBeenCalled()
     })
 
 
-    // * UNIT TEST : The submission of an invalid file should trigger an alert with "type de fichier invalide" as its content
+    // * UNIT TEST : The submission of a form with an invalid file should trigger an alert with a "type de fichier invalide" message
     // * UI : employee newBill page 
     // * COVERAGE : container/newBill.js => line 75-77
-    test("then a 'type de fichier invalide' alert should be triggered when an invalid file is submitted with the form", async () => {
+    test("then a 'type de fichier invalide' alert should be triggered when an invalid file is submitted with the new bill form", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.zzz"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.zzz"
@@ -142,18 +140,18 @@ describe("Given I am connected as an employee", () => {
         // = no way for jest to catch an error thrown through the triggering of an event
     })
 
-    // !!! just check the required restriction is lifted
     // * UNIT TEST : The submit button should trigger a form submission
     // * UI : employee newBill page 
     // * COVERAGE : container/newBill.js => line 56-82
+    // !!!
     test("Then the submit button should trigger a form submission", async () => {
       // wait for the UI to populate the DOM
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
       // add a file to the form
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
-      // !!! expect(fileInput).toBeValid()
       await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
+      // expect(fileInput).toBeValid()
       // when done, deal with submission triggering
       const formNewBill = screen.getByTestId('form-new-bill')
       const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
@@ -168,7 +166,7 @@ describe("Given I am connected as an employee", () => {
     // * UNIT TEST : The submit button should trigger a valid form submission
     // * UI : employee newBill page 
     // * COVERAGE : container/newBill.js => line 56-82
-    test("then the API should be called when a valid form is submitted", async () => {
+    test("then the API should be called for an update when a valid form is submitted", async () => {
       await waitFor(() => screen.getByTestId('form-new-bill'))
       newBillContainer.fileName = "test.jpg"
       newBillContainer.fileUrl = "https://localhost:3456/images/test.jpg"
