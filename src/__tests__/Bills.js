@@ -35,9 +35,9 @@ function InitBillviaOnNavigate() {
 }
 
 function InitWithABillInstance() { 
-  // onNavigate is a fn passed to every containers
-  // so that they can force the navigation to any other pages
-  // we need to instanciate the bill container to accces its methods for our test
+  // onNavigate needs to be passed as a parameter to instanciate a container
+  // container instanciation may be necessary when it's methods are mandatory to achieve a specific test
+  // onNavigate allows programmatic navigation
   document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
   billContainer = new Bills({ document, onNavigate : jest.fn, store: null, localStorage: window.localStorage })
 }
@@ -47,7 +47,7 @@ describe("Given I am connected as an employee", () => {
 
   describe("When I am on the Bills Page", () => {
 
-    test("Then the window icon in the vertical layout should be the only one highlighted", async () => {
+    test("Then the window icon in the vertical nav bar should be the only one highlighted", async () => {
 
         InitBillviaOnNavigate()
         
