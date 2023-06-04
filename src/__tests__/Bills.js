@@ -25,6 +25,7 @@ let billContainer
 Object.defineProperty(window, 'localStorage', { value: localStorageMock })
 window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
 
+// * this Init Fn gives no access to the billContainer methods
 function InitBillviaOnNavigate() {
   // rooter render all the views into a root div by default
   document.body.innerHTML = "<div id='root'></div>"
@@ -34,9 +35,9 @@ function InitBillviaOnNavigate() {
   window.onNavigate(ROUTES_PATH.Bills)
 }
 
+// * this Init Fn gives access to the billContainer methods, which are sometimes mandatory to a achieve some specific tests
 function InitWithABillInstance() { 
   // onNavigate needs to be passed as a parameter to instanciate a container
-  // container instanciation may be necessary when it's methods are mandatory to achieve a specific test
   // onNavigate allows programmatic navigation
   document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
   billContainer = new Bills({ document, onNavigate : jest.fn, store: null, localStorage: window.localStorage })
@@ -44,17 +45,14 @@ function InitWithABillInstance() {
 
 
 describe("Given I am connected as an employee", () => {
-
   describe("When I am on the Bills Page", () => {
-
     test("Then the window icon in the vertical nav bar should be the only one highlighted", async () => {
 
         InitBillviaOnNavigate()
-        
         await waitFor(() => screen.getByTestId('icon-window'))
         const windowIcon = screen.getByTestId('icon-window')
-        // * to-do write expect expression
-        // * unit test 1 
+        // * TODO : composant views/Bills : Le taux de couverture est à 100% néanmoins si tu regardes le premier test il manque la mention “expect”. 
+        // * Ajoute cette mention pour que le test vérifie bien ce que l’on attend de lui.  
         // * solution :
         expect(windowIcon.classList.contains("active-icon")).toBeTruthy()
         expect(screen.getByTestId('icon-mail').classList.contains("active-icon")).toBeFalsy()
@@ -62,25 +60,33 @@ describe("Given I am connected as an employee", () => {
     })
 
     test("Then all the bills tickets should be ordered from the latest to the earliest", () => {
+
         document.body.innerHTML = BillsUI({ data: bills })
         const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
         const antiChrono = (a, b) => ((a < b) ? 1 : -1)
         const datesSorted = [...dates].sort(antiChrono)
         expect(dates).toEqual(datesSorted)
+
     })
     
-    // * UNIT TEST / new bill button click / UI : employee dashboard / container/bill.js coverage line 11
-    test("then clicking on the 'new bill' button should display the 'new bill' form", async () => { // async to be able to use await waitfor
-        // onNavigate necessary on this test since we need to load a new page programmatically after clicking the new bill button
+    // * UNIT TEST : clicking the "new bill" button
+    // * UI : bills & newBills 
+    // * COVERAGE : bill.js Container => Lines : 19-21
+    // async to have access to the waitFor fn
+    test("then clicking on the 'new bill' button should display the 'new bill' form", async () => { 
+
+        // onNavigate necessary on this specific test since there is a programmatic navigation from BillsUI to NewBillUI
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({ pathname })
         }
-        // instanciate the bill container so we can access its handleClickNewBill method
+        // instanciate the bill container to get access to the handleClickNewBill method
         document.body.innerHTML = BillsUI({ data: bills }) // bills out of fixtures/bill.js
         const billContainer = new Bills({ document, onNavigate, store: null, bills:bills, localStorage: window.localStorage })
-        // wait for the UI to populate the DOM
+
+        // wait for the UI to populate the vDOM
         await waitFor(() => screen.getByTestId('btn-new-bill'))
-        // setup to monitor a click of the "new bill" button
+        // setup to monitor any left click of the "new bill" button
+        // billContainer.handleClickNewBill accessible thanks to the billContainer instanciation
         const handleClickNewBillMockFn = jest.fn(billContainer.handleClickNewBill)
         const newBillBtn = screen.getByTestId('btn-new-bill')
         newBillBtn.addEventListener('click', handleClickNewBillMockFn)
@@ -90,14 +96,17 @@ describe("Given I am connected as an employee", () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         // is the form being displayed ?
         expect(screen.getByTestId("form-new-bill")).toBeInTheDocument()
+
     })
 
-    // * UNIT TEST / icon eye button click / UI : employee dashboard / container/bill.js coverage line 23
+    // * UNIT TEST : clicking the "icon eye" button 
+    // * UI : bills
+    // * COVERAGE : bill.js Container => Lines : 23-27
     test("then clicking on the icon eye button should open a modale", async () => { 
         InitWithABillInstance()
         
         await waitFor(() => screen.getAllByTestId('icon-eye'))
-        // select the first eye icon
+        // select the first "icon eye" button
         const iconEyeBtn = screen.getAllByTestId('icon-eye')[0]
         const handleClickIconEyeMockFn = jest.fn((e) => billContainer.handleClickIconEye(iconEyeBtn))
         iconEyeBtn.addEventListener('click', handleClickIconEyeMockFn)

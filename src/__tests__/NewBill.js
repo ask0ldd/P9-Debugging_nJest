@@ -116,7 +116,7 @@ describe("Given I am connected as an employee", () => {
         expect(newBillContainer.fileName).toBe("dracula.png")
     })
 
-    test("then an alert should be triggered when an invalid file is submitted with the form", async () => {
+    test("then an alert should be triggered when an invalid file is submitted within the form", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         newBillContainer.fileName = "test.zzz"
         newBillContainer.fileUrl = "https://localhost:3456/images/test.zzz"
