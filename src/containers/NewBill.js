@@ -26,7 +26,8 @@ export default class NewBill {
     // correction / ajout :
     if(file.type!=="image/jpg" && file.type!=="image/jpeg" && file.type!=="image/png") {
       e.target.value = ""
-      return e.target.files = []
+      e.target.files = []
+      return window.alert("Format de fichier incorrect.")
     }
     //
     const formData = new FormData()
@@ -87,7 +88,7 @@ export default class NewBill {
 
   // not need to cover this function by tests
   updateBill = (bill) => {
-    /* istanbul ignore else */
+    /* istanbul ignore next */
     if (this.store) {
       this.store
       .bills()

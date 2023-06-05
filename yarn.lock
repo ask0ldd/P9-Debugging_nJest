@@ -3466,7 +3466,7 @@
   optionalDependencies:
     "fsevents" "^2.1.2"
 
-"jest-html-reporter@^3.1.3":
+"jest-html-reporter@^3.10.0":
   "integrity" "sha512-V/Nlxc2FVqxjhfh/snY7sceHv09oQICJpdxMJlcfUFOZAhyWGcycemtM2BlqtOGG6S+Bb0hINR+cW0TPiSQBnQ=="
   "resolved" "https://registry.npmjs.org/jest-html-reporter/-/jest-html-reporter-3.10.0.tgz"
   "version" "3.10.0"

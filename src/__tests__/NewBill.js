@@ -181,6 +181,7 @@ describe("Given I am connected as an employee", () => {
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
       expect(newBillContainer.fileName).toBe('dracula.png')
+      // fill the form with some valid values
       fillForm()
       // SOUTENANCE : defining a custom event which will be passed to handleSubmit
       const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
@@ -263,7 +264,6 @@ describe("Given the fact I am connected as an employee", () => {
       )
     })
 
-
     // TEST 3 : Returning a 500 Error (Internal Server Error)
     test("Then after a failed API request returning a 500 error, a dedicated message should appears into the console", async () => {
       mockStore.bills = jest.fn(mockStore.bills)
@@ -340,6 +340,8 @@ describe("Given the fact I am connected as an employee", () => {
       const expectedError = new Error("Erreur 403")
       await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
+
+    // !!!!! ERROR 404
 
   })
 })
