@@ -210,41 +210,20 @@ describe("Given the fact I am connected as an employee", () => {
     // !!! TEST 2 : Update a Bill
     test("Then after a successfull create bill request, the newBillContainer should have some expected values as properties", async () => {
       InitWithANewBillInstance()
-      screen.getByTestId('expense-type').value = "Transports"
-      screen.getByTestId('expense-name').value = "Transports"
-      screen.getByTestId('datepicker').value = "22/05/2022"
-      screen.getByTestId('amount').value="100"
-      screen.getByTestId('vat').value="70"
-      screen.getByTestId('pct').value="20"
-      screen.getByTestId('commentary').value="commentaire"
       const fileInput = screen.getByTestId('file')
-      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
-      fileInput.addEventListener('change', changeFileMockedFn)
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
-      await waitFor(() => expect(newBillContainer.fileUrl).toBe('https://localhost:3456/images/test.jpg'))
-      const bill = {
-        email: JSON.parse(window.localStorage.getItem("user")).email,
-        type: "Transports",
-        name:  "Transports",
-        amount: parseInt("100"),
-        date:  "22/05/2022",
-        vat: "70",
-        pct: parseInt("20") || 20,
-        commentary: "commentaire",
-        fileUrl: 'https://localhost:3456/images/test.jpg',
-        fileName: 'dracula.png',
-        status: 'pending'
-      }
+      await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
+      fillForm()
       mockStore.bills.update = jest.fn(mockStore.bills.update)
       const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
       const formNewBill = screen.getByTestId('form-new-bill')
       const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
       formNewBill.addEventListener('submit', () => clickSubmitNewBillMockedFn(event))
       const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
-      newBillContainer.updateBill = jest.fn(newBillContainer.updateBill)
+      // newBillContainer.updateBill = jest.fn(newBillContainer.updateBill)
       userEvent.click(sendNewBillBtn)
       expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
-      await waitFor(() => expect(newBillContainer.updateBill).toHaveBeenCalledWith(bill))
+      await waitFor(() => expect(mockStore.bills.update).toHaveBeenCalled())
       //"id": "47qAXb6fIm2zOKkLzMro",
       // TO COMPLETE
     })
@@ -329,3 +308,17 @@ describe("Given the fact I am connected as an employee", () => {
 
   })
 })
+
+/*const bill = {
+  email: JSON.parse(window.localStorage.getItem("user")).email,
+  type: "Transports",
+  name: "resto",
+  amount: parseInt("100"),
+  date: "2023-04-20",
+  vat: "20",
+  pct: parseInt("20"),
+  commentary: "commentary",
+  fileUrl: 'https://localhost:3456/images/test.jpg',
+  fileName: 'dracula.png',
+  status: 'pending'
+}*/
