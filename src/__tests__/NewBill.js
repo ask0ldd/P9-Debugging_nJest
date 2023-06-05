@@ -141,7 +141,7 @@ describe("Given I am connected as an employee", () => {
     })
 
 
-    // * UNIT TEST : Clicking the submit button with a valid form should trigger an update bill call to the server
+    // * UNIT TEST : Clicking the submit button with a fully valid form should trigger an update bill call to the server
     // * UI : employee newBill page 
     // * COVERAGE : container/newBill.js => line 56-82
     test("then the API should be called for an update when a valid form is submitted", async () => {
@@ -166,19 +166,18 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-// INTEGRATION TESTS : interactions POST
+// INTEGRATION TESTS : interactions with the mockedStore
 jest.mock("../app/store", () => mockStore)
 
-describe("Given I am connected as an employee", () => {
+describe("Given the fact I am connected as an employee", () => {
   describe("When I am on the Bills Page", () => {
 
     beforeAll(()=>{ 
-      // jest.spyOn(console, "error")
       console.error = jest.fn(() => {})
     })
 
-    // 201 (Success)
-    test("Then a succesfull POST", async () => {
+    // TEST 1 : Create a new Bill
+    test("Then after a successfull create bill request, the newBillContainer should have some expected values as properties", async () => {
       InitWithANewBillInstance()
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
@@ -192,8 +191,13 @@ describe("Given I am connected as an employee", () => {
       expect(newBillContainer.fileName).toBe("dracula.png")
     })
 
-    // 500 (Internal Server Error)
-    test("Then an API call failing with a 500 error should console.error a 500 error message", async () => {
+    // !!! TEST 2 : Update a Bill
+
+
+
+
+    // TEST 3 : Returning a 500 Error (Internal Server Error)
+    test("Then after a failed API request returning a 500 error, a dedicated message should appears into the console", async () => {
       mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {
@@ -212,8 +216,8 @@ describe("Given I am connected as an employee", () => {
       await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
 
-    // 400 (Bad Request)
-    test("Then an API call failing with a 400 error should console.error a 400 error message", async () => {
+    // TEST 4 : Returning a 400 Error (Bad Request)
+    test("Then after a failed API request returning a 400 error, a dedicated message should appears into the console", async () => {
       mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {
@@ -231,8 +235,8 @@ describe("Given I am connected as an employee", () => {
       await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
 
-    // 401 (Unauthorized)
-    test("Then an API call failing with a 401 error should console.error a 401 error message", async () => {
+    // TEST 5 : Returning a 401 Error (Unauthorized)
+    test("Then after a failed API request returning a 401 error, a dedicated message should appears into the console", async () => {
       mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {
@@ -250,8 +254,8 @@ describe("Given I am connected as an employee", () => {
       await waitFor(() => expect(console.error).toBeCalledWith(expectedError))
     })
 
-    // 403 (Forbidden)
-    test("Then an API call failing with a 403 error should console.error a 403 error message", async () => {
+    // TEST 6 : Returning a 403 Error (Forbidden)
+    test("Then after a failed API request returning a 403 error, a dedicated message should appears into the console", async () => {
       mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {

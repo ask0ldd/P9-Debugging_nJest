@@ -70,8 +70,10 @@ export default class NewBill {
       fileName: this.fileName,
       status: 'pending'
     }
+
     // [Bug Hunt] - Bills
     // correction / ajout :
+    if(!this.fileName) return window.alert("Justificatif introuvable.")
     const ext = this.fileName.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
       return window.alert("Type de fichier invalide.")
