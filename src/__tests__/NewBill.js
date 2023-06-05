@@ -44,7 +44,12 @@ function fillForm(){
 
 let newBillContainer
 Object.defineProperty(window, 'localStorage', { value: {...localStorageMock} })
-window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+window.localStorage.setItem('user', JSON.stringify({ 
+  type: 'Employee', 
+  email: 'employee@test.tld',
+  password: 'employee',
+  status: 'connected',
+}))
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
@@ -115,8 +120,19 @@ describe("Given I am connected as an employee", () => {
         fileInput.addEventListener('change', changeFileMockedFn)
         userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
         expect(changeFileMockedFn).toHaveBeenCalled()
-        expect(fileInput.files.length).toEqual(1)
+        await waitFor(() => expect(fileInput.files.length).toEqual(1))
+        const formData = new FormData()
+        formData.append('file', fileInput.files[0])
+        formData.append('email', "employee@test.tld")
         expect(newBillContainer.store.bills().create).toHaveBeenCalled()
+        /*expect(newBillContainer.store.bills().create).toHaveBeenCalledWith(
+          {
+            data: formData,
+            headers: {
+              noContentType: true
+            }
+          }
+        )*/
     })
 
 
@@ -192,8 +208,46 @@ describe("Given the fact I am connected as an employee", () => {
     })
 
     // !!! TEST 2 : Update a Bill
-
-
+    test("Then after a successfull create bill request, the newBillContainer should have some expected values as properties", async () => {
+      InitWithANewBillInstance()
+      screen.getByTestId('expense-type').value = "Transports"
+      screen.getByTestId('expense-name').value = "Transports"
+      screen.getByTestId('datepicker').value = "22/05/2022"
+      screen.getByTestId('amount').value="100"
+      screen.getByTestId('vat').value="70"
+      screen.getByTestId('pct').value="20"
+      screen.getByTestId('commentary').value="commentaire"
+      const fileInput = screen.getByTestId('file')
+      const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
+      fileInput.addEventListener('change', changeFileMockedFn)
+      userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
+      await waitFor(() => expect(newBillContainer.fileUrl).toBe('https://localhost:3456/images/test.jpg'))
+      const bill = {
+        email: JSON.parse(window.localStorage.getItem("user")).email,
+        type: "Transports",
+        name:  "Transports",
+        amount: parseInt("100"),
+        date:  "22/05/2022",
+        vat: "70",
+        pct: parseInt("20") || 20,
+        commentary: "commentaire",
+        fileUrl: 'https://localhost:3456/images/test.jpg',
+        fileName: 'dracula.png',
+        status: 'pending'
+      }
+      mockStore.bills.update = jest.fn(mockStore.bills.update)
+      const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
+      const formNewBill = screen.getByTestId('form-new-bill')
+      const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
+      formNewBill.addEventListener('submit', () => clickSubmitNewBillMockedFn(event))
+      const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
+      newBillContainer.updateBill = jest.fn(newBillContainer.updateBill)
+      userEvent.click(sendNewBillBtn)
+      expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
+      await waitFor(() => expect(newBillContainer.updateBill).toHaveBeenCalledWith(bill))
+      //"id": "47qAXb6fIm2zOKkLzMro",
+      // TO COMPLETE
+    })
 
 
     // TEST 3 : Returning a 500 Error (Internal Server Error)
