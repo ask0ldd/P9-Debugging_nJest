@@ -22,7 +22,7 @@ const bill = {
   type: "Transports",
   name: "resto",
   amount: 100,
-  date: "",
+  date: "2023-04-20",
   vat: "20",
   pct: 20,
   commentary: "commentary",
@@ -50,8 +50,9 @@ function InitWithANewBillInstance() {
 function fillForm(){
   userEvent.type(screen.getByTestId("expense-name"), "resto")
   userEvent.type(screen.getByTestId("amount"), "100")
-  // userEvent.type(screen.getByTestId("datepicker"), "2023-04-20")
-  userEvent.type(screen.getByTestId("datepicker"), "20/04/2022")
+  userEvent.clear(screen.getByTestId("datepicker"))
+  userEvent.type(screen.getByTestId("datepicker"), "2023-04-20")
+  // userEvent.type(screen.getByTestId("datepicker"), "20/04/2022")
   userEvent.type(screen.getByTestId("vat"), "20")
   userEvent.type(screen.getByTestId("pct"), "20")
   userEvent.type(screen.getByTestId("commentary"), "commentary")
@@ -238,7 +239,24 @@ describe("Given the fact I am connected as an employee", () => {
       userEvent.click(sendNewBillBtn)
       expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
       await waitFor(() => expect(mockStore.bills().update).toHaveBeenCalledWith({data: JSON.stringify(bill), selector: newBillContainer.billId}))
-      //"id": "47qAXb6fIm2zOKkLzMro",
+      /*expect(mockStore.bills().update).toHaveReturnedWith(
+        {
+          "id": "47qAXb6fIm2zOKkLzMro",
+          "vat": "80",
+          "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
+          "status": "pending",
+          "type": "Hôtel et logement",
+          "commentary": "séminaire billed",
+          "name": "encore",
+          "fileName": "preview-facture-free-201801-pdf-1.jpg",
+          "date": "2004-04-04",
+          "amount": 400,
+          "commentAdmin": "ok",
+          "email": "a@a",
+          "pct": 20
+        }
+      )*/
+
       // !!! TO COMPLETE
     })
 

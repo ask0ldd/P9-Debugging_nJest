@@ -73,6 +73,7 @@ export default class NewBill {
 
     // [Bug Hunt] - Bills
     // correction / ajout :
+    /* istanbul ignore else */
     if(!this.fileName) return window.alert("Justificatif introuvable.")
     const ext = this.fileName.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
