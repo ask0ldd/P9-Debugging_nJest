@@ -209,7 +209,7 @@ describe("Given the fact I am connected as an employee", () => {
     })
 
     // TEST 1 : Create a new Bill
-    test("Then after a successfull create bill request, the newBillContainer should have some expected values as properties", async () => {
+    test("Then after a successfull create bill request, the newBillContainer should have some expected values returned from the mockedStore as properties", async () => {
       InitWithANewBillInstance()
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
@@ -223,8 +223,8 @@ describe("Given the fact I am connected as an employee", () => {
       expect(newBillContainer.fileName).toBe("dracula.png")
     })
 
-    // TEST 2 : Update a Bill
-    test("Then after a successfull create bill request, the newBillContainer should have some expected values as properties", async () => {
+    // TEST 2 : Update an existing Bill
+    test("Then after a successfull update bill request, the resolved value should be the generic object sent by the mockedStore", async () => {
       InitWithANewBillInstance()
       const fileInput = screen.getByTestId('file')
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
@@ -338,17 +338,3 @@ describe("Given the fact I am connected as an employee", () => {
 
   })
 })
-
-/*const bill = {
-  email: JSON.parse(window.localStorage.getItem("user")).email,
-  type: "Transports",
-  name: "resto",
-  amount: parseInt("100"),
-  date: "2023-04-20",
-  vat: "20",
-  pct: parseInt("20"),
-  commentary: "commentary",
-  fileUrl: 'https://localhost:3456/images/test.jpg',
-  fileName: 'dracula.png',
-  status: 'pending'
-}*/
