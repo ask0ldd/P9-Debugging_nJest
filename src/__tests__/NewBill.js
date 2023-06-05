@@ -18,7 +18,6 @@ const bodytoTestFile = () => {
 }
 
 const bill = {
-  /*email: "employee@test.tld",*/
   type: "Transports",
   name: "resto",
   amount: 100,
@@ -41,7 +40,7 @@ function InitNewBillviaOnNavigate() {
     window.onNavigate(ROUTES_PATH.NewBill)
 }
 
-// NewBillsUI alone + instanciation of newbill container > access to the related methods
+// Instanciation of the newBill container so we can access its methods during our test
 function InitWithANewBillInstance() {
   document.body.innerHTML = NewBillUI()
   newBillContainer = new NewBill({ document, onNavigate : jest.fn, store: {...mockStore}, localStorage: window.localStorage })
@@ -52,7 +51,6 @@ function fillForm(){
   userEvent.type(screen.getByTestId("amount"), "100")
   userEvent.clear(screen.getByTestId("datepicker"))
   userEvent.type(screen.getByTestId("datepicker"), "2023-04-20")
-  // userEvent.type(screen.getByTestId("datepicker"), "20/04/2022")
   userEvent.type(screen.getByTestId("vat"), "20")
   userEvent.type(screen.getByTestId("pct"), "20")
   userEvent.type(screen.getByTestId("commentary"), "commentary")
@@ -213,11 +211,12 @@ describe("Given the fact I am connected as an employee", () => {
       InitWithANewBillInstance()
       await waitFor(() => screen.getByTestId('form-new-bill'))
       const fileInput = screen.getByTestId('file')
+      // uploading a png file
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
       fileInput.addEventListener('change', changeFileMockedFn)
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       expect(changeFileMockedFn).toHaveBeenCalled()
-      // those values are expected to be returned when the POST request to the mockedStore is successfull
+      // check if the expected values are returned by the mockedStore in response to our successful POST request
       await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
       expect(newBillContainer.fileUrl).toBe('https://localhost:3456/images/test.jpg')
       expect(newBillContainer.fileName).toBe("dracula.png")
@@ -227,18 +226,24 @@ describe("Given the fact I am connected as an employee", () => {
     test("Then after a successfull update bill request, the resolved value should be the generic object sent by the mockedStore", async () => {
       InitWithANewBillInstance()
       const fileInput = screen.getByTestId('file')
+      // uploading a png file
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
+      // filling the form with valid values
       fillForm()
       mockStore.bills().update = jest.fn(mockStore.bills().update)
+      // a custom event that will be passed on submit so event.target.querySelector will get access to the right DOM
       const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
       const formNewBill = screen.getByTestId('form-new-bill')
       const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
       formNewBill.addEventListener('submit', () => clickSubmitNewBillMockedFn(event))
+      // submitting the newBill form
       const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
       userEvent.click(sendNewBillBtn)
       expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
+      // check if update has been passed the right object
       await waitFor(() => expect(mockStore.bills().update).toHaveBeenCalledWith({data: JSON.stringify(bill), selector: newBillContainer.billId}))
+      // check if the mockedStore replied to our successful request with the expected object
       await expect(mockStore.bills().update(bill)).resolves.toEqual(
         {
           id: "47qAXb6fIm2zOKkLzMro",

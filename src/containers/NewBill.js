@@ -73,8 +73,9 @@ export default class NewBill {
 
     // [Bug Hunt] - Bills
     // correction / ajout :
+    let ext = null
     /* istanbul ignore else */
-    const ext = this.fileName.split('.')[1] || null
+    if(this.fileName) ext = this.fileName.split('.')[1]
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
       return window.alert("Type de fichier invalide.")
     }
