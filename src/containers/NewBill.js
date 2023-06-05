@@ -74,12 +74,10 @@ export default class NewBill {
     // [Bug Hunt] - Bills
     // correction / ajout :
     /* istanbul ignore else */
-    if(!this.fileName) return window.alert("Justificatif introuvable.")
-    const ext = this.fileName.split('.')[1]
+    const ext = this.fileName.split('.')[1] || null
     if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
       return window.alert("Type de fichier invalide.")
     }
-    // PUT ?
     this.updateBill(bill)
     // console.log(this.store.bills().list())
     this.onNavigate(ROUTES_PATH['Bills'])

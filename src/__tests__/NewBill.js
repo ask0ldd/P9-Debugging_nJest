@@ -137,10 +137,10 @@ describe("Given I am connected as an employee", () => {
         userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
         expect(changeFileMockedFn).toHaveBeenCalled()
         await waitFor(() => expect(fileInput.files.length).toEqual(1))
-        const formData = new FormData()
+        /*const formData = new FormData()
         formData.append('file', fileInput.files[0])
-        formData.append('email', "employee@test.tld")
-        expect(newBillContainer.store.bills().create).toHaveBeenCalled()
+        formData.append('email', "employee@test.tld")*/
+        await waitFor(() => expect(newBillContainer.store.bills().create).toHaveBeenCalled()) // !!!
         /*expect(newBillContainer.store.bills().create).toHaveBeenCalledWith(
           {
             data: formData,
