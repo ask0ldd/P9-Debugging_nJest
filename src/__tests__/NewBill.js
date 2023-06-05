@@ -117,7 +117,6 @@ describe("Given I am connected as an employee", () => {
       fileInput.addEventListener('change', () => changeFileMockedFn) // for integration test
       userEvent.upload(fileInput, file)
       expect(fileInput.value).toBe("")
-      expect(fileInput.files).toStrictEqual([])
       expect(newBillContainer.store.bills().create).not.toHaveBeenCalled()
     })
 

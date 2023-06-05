@@ -26,8 +26,8 @@ export default class NewBill {
     // correction / ajout :
     if(file.type!=="image/jpg" && file.type!=="image/jpeg" && file.type!=="image/png") {
       e.target.value = ""
-      e.target.files = []
-      return window.alert("Format de fichier incorrect.")
+      // e.target.files = []
+      return window.alert("Type de fichier invalide.")
     }
     //
     const formData = new FormData()
