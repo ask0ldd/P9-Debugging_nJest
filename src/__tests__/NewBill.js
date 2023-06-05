@@ -223,7 +223,7 @@ describe("Given the fact I am connected as an employee", () => {
       expect(newBillContainer.fileName).toBe("dracula.png")
     })
 
-    // !!! TEST 2 : Update a Bill
+    // TEST 2 : Update a Bill
     test("Then after a successfull create bill request, the newBillContainer should have some expected values as properties", async () => {
       InitWithANewBillInstance()
       const fileInput = screen.getByTestId('file')
@@ -239,25 +239,23 @@ describe("Given the fact I am connected as an employee", () => {
       userEvent.click(sendNewBillBtn)
       expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
       await waitFor(() => expect(mockStore.bills().update).toHaveBeenCalledWith({data: JSON.stringify(bill), selector: newBillContainer.billId}))
-      /*expect(mockStore.bills().update).toHaveReturnedWith(
+      await expect(mockStore.bills().update(bill)).resolves.toEqual(
         {
-          "id": "47qAXb6fIm2zOKkLzMro",
-          "vat": "80",
-          "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
-          "status": "pending",
-          "type": "Hôtel et logement",
-          "commentary": "séminaire billed",
-          "name": "encore",
-          "fileName": "preview-facture-free-201801-pdf-1.jpg",
-          "date": "2004-04-04",
-          "amount": 400,
-          "commentAdmin": "ok",
-          "email": "a@a",
-          "pct": 20
+          id: "47qAXb6fIm2zOKkLzMro",
+          vat: "80",
+          fileUrl: "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
+          status: "pending",
+          type: "Hôtel et logement",
+          commentary: "séminaire billed",
+          name: "encore",
+          fileName: "preview-facture-free-201801-pdf-1.jpg",
+          date: "2004-04-04",
+          amount: 400,
+          commentAdmin: "ok",
+          email: "a@a",
+          pct: 20
         }
-      )*/
-
-      // !!! TO COMPLETE
+      )
     })
 
 
