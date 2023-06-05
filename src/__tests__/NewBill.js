@@ -17,6 +17,20 @@ const bodytoTestFile = () => {
   fs.writeFile('../test.txt', document.body.innerHTML, err => { if (err) { console.error(err) } })
 }
 
+const bill = {
+  /*email: "employee@test.tld",*/
+  type: "Transports",
+  name: "resto",
+  amount: 100,
+  date: "",
+  vat: "20",
+  pct: 20,
+  commentary: "commentary",
+  fileUrl: 'https://localhost:3456/images/test.jpg',
+  fileName: 'dracula.png',
+  status: 'pending'
+}
+
 // verticalLayout + NewBillsUI
 function InitNewBillviaOnNavigate() {
     // rooter() render all the views into a root div by default
@@ -36,7 +50,8 @@ function InitWithANewBillInstance() {
 function fillForm(){
   userEvent.type(screen.getByTestId("expense-name"), "resto")
   userEvent.type(screen.getByTestId("amount"), "100")
-  userEvent.type(screen.getByTestId("datepicker"), "2023-04-20")
+  // userEvent.type(screen.getByTestId("datepicker"), "2023-04-20")
+  userEvent.type(screen.getByTestId("datepicker"), "20/04/2022")
   userEvent.type(screen.getByTestId("vat"), "20")
   userEvent.type(screen.getByTestId("pct"), "20")
   userEvent.type(screen.getByTestId("commentary"), "commentary")
@@ -214,18 +229,17 @@ describe("Given the fact I am connected as an employee", () => {
       userEvent.upload(fileInput, new File(['(-(•̀ᵥᵥ•́)-)'], 'dracula.png', {type: 'image/png'}))
       await waitFor(() => expect(newBillContainer.billId).toBe('1234'))
       fillForm()
-      mockStore.bills.update = jest.fn(mockStore.bills.update)
+      mockStore.bills().update = jest.fn(mockStore.bills().update)
       const event = { preventDefault: () => {}, target:{querySelector : () => document.querySelector}}
       const formNewBill = screen.getByTestId('form-new-bill')
       const clickSubmitNewBillMockedFn = jest.fn(newBillContainer.handleSubmit)
       formNewBill.addEventListener('submit', () => clickSubmitNewBillMockedFn(event))
       const sendNewBillBtn = document.body.querySelector("#btn-send-bill")
-      // newBillContainer.updateBill = jest.fn(newBillContainer.updateBill)
       userEvent.click(sendNewBillBtn)
       expect(clickSubmitNewBillMockedFn).toHaveBeenCalled()
-      await waitFor(() => expect(mockStore.bills.update).toHaveBeenCalled())
+      await waitFor(() => expect(mockStore.bills().update).toHaveBeenCalledWith({data: JSON.stringify(bill), selector: newBillContainer.billId}))
       //"id": "47qAXb6fIm2zOKkLzMro",
-      // TO COMPLETE
+      // !!! TO COMPLETE
     })
 
 
