@@ -115,9 +115,11 @@ describe("Given I am connected as an employee", () => {
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
       newBillContainer.store.bills().create = jest.fn(newBillContainer.store.bills().create)
       fileInput.addEventListener('change', () => changeFileMockedFn) // for integration test
+      jest.spyOn(window, 'alert').mockImplementation(() => {})
       userEvent.upload(fileInput, file)
       expect(fileInput.value).toBe("")
       expect(newBillContainer.store.bills().create).not.toHaveBeenCalled()
+      expect(window.alert).toBeCalledWith("Type de fichier invalide.")
     })
 
 

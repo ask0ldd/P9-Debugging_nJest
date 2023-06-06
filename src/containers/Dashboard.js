@@ -11,6 +11,7 @@ export const filteredBills = (data, status) => {
       let selectCondition
 
       // in jest environment
+      /* istanbul ignore else */
       if (typeof jest !== 'undefined') {
         selectCondition = (bill.status === status)
       }

@@ -26,7 +26,6 @@ export default class NewBill {
     // correction / ajout :
     if(file.type!=="image/jpg" && file.type!=="image/jpeg" && file.type!=="image/png") {
       e.target.value = ""
-      // e.target.files = []
       return window.alert("Type de fichier invalide.")
     }
     //
@@ -45,7 +44,7 @@ export default class NewBill {
         }
       })
       // if POST is a success : this.fileName = the input file name, this.billID = "1234", this.fileUrl = 'https://localhost:3456/images/test.jpg'
-      // "1234" and a defined url are returned by create(bill)
+      // "1234" and a fixed url are returned by create(bill)
       .then(({fileUrl, key}) => {
         this.billId = key
         this.fileUrl = fileUrl
@@ -76,8 +75,9 @@ export default class NewBill {
     // correction / ajout :
     let ext = null
     /* istanbul ignore else */
-    if(this.fileName) ext = this.fileName.split('.')[1]
-    if(ext!=="jpg" && ext!=="jpeg" && ext!=="png") {
+    const regex = /.(jpg|jpeg|png)$/gi
+    if(this.fileName.match(regex) == null)
+    {
       return window.alert("Type de fichier invalide.")
     }
     this.updateBill(bill)
