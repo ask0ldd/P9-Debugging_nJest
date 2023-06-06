@@ -73,6 +73,7 @@ export default class {
     this.document = document
     this.onNavigate = onNavigate
     this.store = store
+    this.activeBillId = ""
     $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
     $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2)) // [Bug Hunt] - Dashboard tickets : triggered by open tickets lists arrow
     $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3)) // same
@@ -91,7 +92,9 @@ export default class {
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     if (this.counter % 2 === 0) {*/
     // added
-    if(!(bills.filter(b => document.querySelector(`#open-bill${b.id}`).style.backgroundColor === "#2A2B35")).length){
+    if(this.activeBillId !== bill.id)
+    {
+      this.activeBillId = bill.id
       bills.forEach(b => {
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
       })
@@ -100,6 +103,7 @@ export default class {
       $('.vertical-navbar').css({ height: '150vh' })
       // this.counter ++
     } else {
+      this.activeBillId = ""
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
       $('.dashboard-right-container div').html(`
