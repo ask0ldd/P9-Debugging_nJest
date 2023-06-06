@@ -87,16 +87,18 @@ export default class {
   }
 
   handleEditTicket(e, bill, bills) {
-    if (this.counter === undefined || this.id !== bill.id) this.counter = 0
+    /*if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
-    if (this.counter % 2 === 0) {
+    if (this.counter % 2 === 0) {*/
+    // added
+    if(!(bills.filter(b => document.querySelector(`#open-bill${b.id}`).style.backgroundColor === "#2A2B35")).length){
       bills.forEach(b => {
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
       })
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
       $('.vertical-navbar').css({ height: '150vh' })
-      this.counter ++
+      // this.counter ++
     } else {
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
@@ -104,7 +106,7 @@ export default class {
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({ height: '120vh' })
-      this.counter ++
+      // this.counter ++
     }
     $('#icon-eye-d').click(this.handleClickIconEye)
     $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
@@ -134,7 +136,6 @@ export default class {
 
 
   handleShowTickets(e, bills, index) {
-    // index = billsType of the category being opened
     /*if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if (this.counter % 2 === 0) {
@@ -148,9 +149,15 @@ export default class {
         .html("")
       this.counter ++
     }*/
+
+    // index = billsType of the category being opened
     if($(`#status-bills-container${index}`).html().trim() === ""){
       $(`#arrow-icon${index}`).css({ transform: 'rotate(0deg)'})
       $(`#status-bills-container${index}`).html(cards(filteredBills(bills, getStatus(index))))
+      bills.forEach(bill => { 
+        if(bill.status === getStatus(index)) // click deprecated : $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+        document.querySelector(`#open-bill${bill.id}`).addEventListener('click', (e) => this.handleEditTicket(e, bill, bills))
+      })
     }
     else{
       $(`#arrow-icon${index}`).css({ transform: 'rotate(90deg)'})
@@ -166,7 +173,7 @@ export default class {
       // this.index = 1 | 2 | 3 => converted to pending | accepted | refused using getStatus
       // bills has a status property to check
       // add a click event only to the tickets which are part of the category which is being opened
-      if(bill.status === getStatus(this.index)) $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+      // if(bill.status === getStatus(index)) $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })
 
     return bills
