@@ -152,9 +152,9 @@ export default class {
       // $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
       //
       // Correction :
-      // this.index = 1 | 2 | 3 and 1 means pending, 2 accepted, 3 refused
-      // getStatus convert this index into pending / accepted / refused
+      // this.index = 1 | 2 | 3 => converted to pending | accepted | refused using getStatus
       // bills has a status property to check
+      // add a click event only to the tickets which are part of the category which is being opened
       if(bill.status === getStatus(this.index)) $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })
 
