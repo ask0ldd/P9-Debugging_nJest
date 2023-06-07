@@ -44,7 +44,7 @@ function InitWithABillInstance() {
 }
 
 
-describe("Given I am connected as an employee", () => {
+describe("Given that I am connected as an employee", () => {
   describe("When I am on the Bills Page", () => {
     test("Then the window icon in the vertical nav bar should be the only one highlighted", async () => {
         InitBillviaOnNavigate()
@@ -176,7 +176,7 @@ describe("Given I am connected as an employee", () => {
 
 jest.mock("../app/Store", () => mockStore)
 
-describe("Given I am connected as an employee", () => {
+describe("Given that I am connected as an employee", () => {
   describe("When I am on the Bills Page", () => {
     test("Then a succesfull fetch should lead to 4 specific bills being displayed", async () => {
       InitBillviaOnNavigate()

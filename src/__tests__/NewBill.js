@@ -65,7 +65,7 @@ window.localStorage.setItem('user', JSON.stringify({
   status: 'connected',
 }))
 
-describe("Given I am connected as an employee", () => {
+describe("Given that I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
     beforeAll(() => InitNewBillviaOnNavigate())
@@ -99,7 +99,7 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-describe("Given I am connected as an employee", () => {
+describe("Given that I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
     beforeEach(()=>{ InitWithANewBillInstance() })
@@ -201,7 +201,7 @@ describe("Given I am connected as an employee", () => {
 // INTEGRATION TESTS : interactions with the mockedStore
 jest.mock("../app/store", () => mockStore)
 
-describe("Given the fact I am connected as an employee", () => {
+describe("Given that I am connected as an employee", () => {
   describe("When I am on the Bills Page", () => {
 
     beforeAll(()=>{ 
