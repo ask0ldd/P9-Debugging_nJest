@@ -90,12 +90,12 @@ export default class {
   }
 
   handleEditTicket(e, bill, bills) {
-    /* TRASHED CODE :
+    /* TRASHED ORIGINAL CODE :
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     if (this.counter % 2 === 0) {*/
 
-    // tracking the active bill is enough to achieve a better result
+    // tracking the active bill is enough to achieve an even better result
     if(this.activeBill.id !== bill.id)
     {
       this.activeBill = bill
@@ -105,7 +105,7 @@ export default class {
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
       $('.vertical-navbar').css({ height: '150vh' })
-      // TRASHED CODE : this.counter ++
+      // TRASHED ORIGINAL CODE : this.counter ++
     } else {
       this.activeBill = {id: '', status: ''}
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
@@ -114,7 +114,7 @@ export default class {
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({ height: '120vh' })
-      // TRASHED CODE : this.counter ++
+      // TRASHED ORIGINAL CODE : this.counter ++
     }
     $('#icon-eye-d').click(this.handleClickIconEye)
     $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
@@ -143,8 +143,8 @@ export default class {
 
 
 
-  handleShowTickets(e, bills, index) {
-    /* TRASHED CODE :
+  handleShowTickets(e, bills, index) { // index = index of the category to open / close
+    /* TRASHED ORIGINAL CODE :
     if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if (this.counter % 2 === 0) {
@@ -160,7 +160,7 @@ export default class {
     }*/
 
     // [Bug Hunt] - Dashboard tickets : triggered by open tickets lists arrow
-    // index = billsType of the category being opened
+    // check if the category is opened with no need of any tracking variable
     if($(`#status-bills-container${index}`).html().trim() === ""){
       $(`#arrow-icon${index}`).css({ transform: 'rotate(0deg)'})
       $(`#status-bills-container${index}`).html(cards(filteredBills(bills, getStatus(index))))
@@ -183,8 +183,8 @@ export default class {
       }
     }
 
-    /* OLD CODE :
-    add a new click listener to all visible tickets even if they already have one
+    /* TRASHED ORIGINAL CODE :
+    MAIN CULPRIT : was adding a new click listener to all visible tickets even if they already have one
     bills.forEach(bill => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })*/
