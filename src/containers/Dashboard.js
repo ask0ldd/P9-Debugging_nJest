@@ -186,7 +186,7 @@ export default class {
     }
 
     /* TRASHED ORIGINAL CODE :
-    MAIN CULPRIT : was adding a new click listener to all visible tickets even if they already have one
+    BUG MAIN SOURCE : was adding a new click listener to all visible tickets even if they already have one
     bills.forEach(bill => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })*/
