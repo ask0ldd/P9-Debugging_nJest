@@ -73,10 +73,12 @@ export default class {
     this.document = document
     this.onNavigate = onNavigate
     this.store = store
-    this.activeBillId = ""
+    // ADDED
+    this.activeBill = {id: '', status: ''}
+    //
     $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
-    $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2)) // [Bug Hunt] - Dashboard tickets : triggered by open tickets lists arrow
-    $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3)) // same
+    $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
+    $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
     new Logout({ localStorage, onNavigate })
   }
 
@@ -88,29 +90,31 @@ export default class {
   }
 
   handleEditTicket(e, bill, bills) {
-    /*if (this.counter === undefined || this.id !== bill.id) this.counter = 0
+    /* TRASHED CODE :
+    if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     if (this.counter % 2 === 0) {*/
-    // added
-    if(this.activeBillId !== bill.id)
+
+    // tracking the active bill is enough to achieve a better result
+    if(this.activeBill.id !== bill.id)
     {
-      this.activeBillId = bill.id
+      this.activeBill = bill
       bills.forEach(b => {
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
       })
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
       $('.vertical-navbar').css({ height: '150vh' })
-      // this.counter ++
+      // TRASHED CODE : this.counter ++
     } else {
-      this.activeBillId = ""
+      this.activeBill = {id: '', status: ''}
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
       $('.dashboard-right-container div').html(`
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({ height: '120vh' })
-      // this.counter ++
+      // TRASHED CODE : this.counter ++
     }
     $('#icon-eye-d').click(this.handleClickIconEye)
     $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
@@ -140,7 +144,8 @@ export default class {
 
 
   handleShowTickets(e, bills, index) {
-    /*if (this.counter === undefined || this.index !== index) this.counter = 0
+    /* TRASHED CODE :
+    if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if (this.counter % 2 === 0) {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
@@ -154,11 +159,13 @@ export default class {
       this.counter ++
     }*/
 
+    // [Bug Hunt] - Dashboard tickets : triggered by open tickets lists arrow
     // index = billsType of the category being opened
     if($(`#status-bills-container${index}`).html().trim() === ""){
       $(`#arrow-icon${index}`).css({ transform: 'rotate(0deg)'})
       $(`#status-bills-container${index}`).html(cards(filteredBills(bills, getStatus(index))))
       bills.forEach(bill => { 
+        // DEBUGGING : Add a click listener only to the tickets which are part of the category being opened
         if(bill.status === getStatus(index)) // click deprecated : $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
         document.querySelector(`#open-bill${bill.id}`).addEventListener('click', (e) => this.handleEditTicket(e, bill, bills))
       })
@@ -166,19 +173,21 @@ export default class {
     else{
       $(`#arrow-icon${index}`).css({ transform: 'rotate(90deg)'})
       $(`#status-bills-container${index}`).html("")
+      // If the active bill is part of the category being close, it should be considered as active anymore
+      if(this.activeBill.status === getStatus(index)) {
+        this.activeBill = {id: '', status: ''}
+        $('.dashboard-right-container div').html(`
+          <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
+        `)
+        $('.vertical-navbar').css({ height: '120vh' })
+      }
     }
 
+    /* OLD CODE :
+    add a new click listener to all visible tickets even if they already have one
     bills.forEach(bill => {
-      // [Bug Hunt] - Dashboard tickets : triggered by open tickets lists arrow
-      // add a new click event to all visible tickets even if they already have one
-      // $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
-      //
-      // Correction :
-      // this.index = 1 | 2 | 3 => converted to pending | accepted | refused using getStatus
-      // bills has a status property to check
-      // add a click event only to the tickets which are part of the category which is being opened
-      // if(bill.status === getStatus(index)) $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
-    })
+      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+    })*/
 
     return bills
 
