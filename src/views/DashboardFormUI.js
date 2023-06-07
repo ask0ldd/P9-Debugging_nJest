@@ -14,7 +14,7 @@ export const modal = () => (`
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body" data-toggle="modal">
+        <div class="modal-body" style="overflow:scroll" data-toggle="modal">
         </div>
       </div>
     </div>

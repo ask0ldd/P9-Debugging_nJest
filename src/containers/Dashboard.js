@@ -160,20 +160,22 @@ export default class {
     }*/
 
     // [Bug Hunt] - Dashboard tickets : triggered by open tickets lists arrow
-    // check if the category is opened with no need of any tracking variable
-    if($(`#status-bills-container${index}`).html().trim() === ""){
+    // check if the category is opened through innerHTML, so no need of any tracking variable
+    if($(`#status-bills-container${index}`)?.html().trim() === ""){
       $(`#arrow-icon${index}`).css({ transform: 'rotate(0deg)'})
       $(`#status-bills-container${index}`).html(cards(filteredBills(bills, getStatus(index))))
       bills.forEach(bill => { 
         // DEBUGGING : Add a click listener only to the tickets which are part of the category being opened
-        if(bill.status === getStatus(index)) // click deprecated : $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
-        document.querySelector(`#open-bill${bill.id}`).addEventListener('click', (e) => this.handleEditTicket(e, bill, bills))
+        if(bill.status === getStatus(index))
+          // .on() cause .click() is deprecated
+          $(`#open-bill${bill.id}`).on('click', (e) => this.handleEditTicket(e, bill, bills))
       })
     }
     else{
       $(`#arrow-icon${index}`).css({ transform: 'rotate(90deg)'})
       $(`#status-bills-container${index}`).html("")
-      // If the active bill is part of the category being close, it should be considered as active anymore
+      // If the active bill is part of the category being closed, 
+      // it should be considered as inactive and the bill form should be closed
       if(this.activeBill.status === getStatus(index)) {
         this.activeBill = {id: '', status: ''}
         $('.dashboard-right-container div').html(`
