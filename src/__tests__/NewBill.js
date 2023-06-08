@@ -225,7 +225,7 @@ describe("Given that I am connected as an employee", () => {
     })
 
     // TEST 2 : Update an existing Bill
-    test("Then after a successfull update bill request, the resolved value should be the generic object sent by the mockedStore", async () => {
+    test("Then after a successfull update bill request, the resolved value should be a generic object sent by the mockedStore", async () => {
       InitWithANewBillInstance()
       const fileInput = screen.getByTestId('file')
       // uploading a png file
