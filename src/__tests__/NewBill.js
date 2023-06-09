@@ -129,7 +129,7 @@ describe("Given that I am connected as an employee", () => {
     test("Then a valid file can successfully be added to the form & trigger a new bill creation call to the server", async () => {
         await waitFor(() => screen.getByTestId('form-new-bill'))
         const fileInput = screen.getByTestId('file')
-        // NB : Create Bill request is called within handlechangefile
+        // NB : Bill creation is called within handlechangefile
         const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
         newBillContainer.store.bills().create = jest.fn(newBillContainer.store.bills().create)
         fileInput.addEventListener('change', changeFileMockedFn)
