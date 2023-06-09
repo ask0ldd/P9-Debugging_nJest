@@ -100,7 +100,6 @@ export default class {
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
       $('.vertical-navbar').css({ height: '150vh' })
-      // TRASHED ORIGINAL CODE : this.counter ++
     } else {
       this.activeBill = {id: '', status: ''}
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
@@ -109,7 +108,6 @@ export default class {
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({ height: '120vh' })
-      // TRASHED ORIGINAL CODE : this.counter ++
     }
     $('#icon-eye-d').click(this.handleClickIconEye)
     $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
@@ -147,7 +145,7 @@ export default class {
       bills.forEach(bill => { 
         // DEBUGGING : Add a click listener only to the tickets which are part of the category being opened
         if(bill.status === getStatus(index))
-          // .on() cause .click() is deprecated
+          // .on() because .click() is now deprecated
           $(`#open-bill${bill.id}`).on('click', (e) => this.handleEditTicket(e, bill, bills))
       })
     }
@@ -165,8 +163,8 @@ export default class {
       }
     }
 
-    /* TRASHED ORIGINAL CODE :
-    BUG MAIN SOURCE : was adding a new click listener to all visible tickets even if they already have one
+    /* EXCLUDED :
+    BUG MAIN SOURCE : was adding a new click listener to all visible tickets even if they already had one
     bills.forEach(bill => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })*/
@@ -196,7 +194,7 @@ export default class {
     }
   }
 
-  // not need to cover this function by tests
+  // no need to cover this function by tests
   /* istanbul ignore next */
   updateBill = (bill) => {
     if (this.store) {
