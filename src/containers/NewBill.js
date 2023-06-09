@@ -19,7 +19,7 @@ export default class NewBill {
 
   handleChangeFile = e => {
     e.preventDefault()
-    if(!JSON.parse(localStorage.getItem("user"))?.status) return console.log("User not connected.")
+    //if(!JSON.parse(localStorage.getItem("user"))?.status) return console.log("User not connected.")
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = (file.name).split('/\\/g')
     const fileName = filePath[filePath.length-1]
@@ -56,7 +56,7 @@ export default class NewBill {
 
   handleSubmit = e => {
     e.preventDefault()
-    if(!JSON.parse(localStorage.getItem("user"))?.status) return console.log("User not connected.")
+    //if(!JSON.parse(localStorage.getItem("user"))?.status) return console.log("User not connected.")
     // console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
     const email = JSON.parse(localStorage.getItem("user")).email
     const bill = {
