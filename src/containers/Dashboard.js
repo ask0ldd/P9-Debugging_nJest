@@ -83,8 +83,12 @@ export default class {
   }
 
   handleClickIconEye = () => {
-    const billUrl = $('#icon-eye-d').attr("data-bill-url")
-    const imgWidth = Math.floor($('#modaleFileAdmin1').width() * 0.8)
+    let billUrl = $('#icon-eye-d').attr("data-bill-url")
+    let imgWidth = Math.floor($('#modaleFileAdmin1').width() * 0.8)
+    if(billUrl.includes("null")) {
+      billUrl = "http://localhost:5678/public/placeholder.jpg"
+      imgWidth = 584
+    }
     $('#modaleFileAdmin1').find(".modal-body").html(`<div style='text-align: center;'><img width=${imgWidth} src=${billUrl} alt="Bill"/></div>`)
     if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show')
   }
