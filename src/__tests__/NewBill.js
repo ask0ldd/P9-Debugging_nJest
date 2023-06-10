@@ -208,7 +208,6 @@ describe("Given that I am connected as an employee", () => {
     afterEach(() => {
       resetTestEnv()
       console.error.mockClear()
-      // mockStore.bills.mockClear()
     })
 
     // TEST 1 : Create a new Bill
@@ -227,7 +226,7 @@ describe("Given that I am connected as an employee", () => {
       expect(newBillContainer.fileName).toBe("dracula.png")
     })
 
-    // TEST 2 : Update an existing Bill
+    // TEST 2 : Update a created bill with the form datas
     test("Then after a successfull update bill request, the resolved value should be a generic object sent by the mockedStore", async () => {
       InitWithANewBillInstance()
       const fileInput = screen.getByTestId('file')
