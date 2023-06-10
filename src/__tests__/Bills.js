@@ -48,7 +48,6 @@ function resetTestEnv(){
   billContainer = null
 }
 
-
 describe("Given that I am connected as an employee", () => {
   describe("When I am on the Bills Page", () => {
 

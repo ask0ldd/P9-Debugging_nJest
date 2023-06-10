@@ -46,6 +46,11 @@ function InitWithANewBillInstance() {
   newBillContainer = new NewBill({ document, onNavigate : jest.fn, store: {...mockStore}, localStorage: window.localStorage })
 }
 
+function resetTestEnv(){
+  document.body.innerHTML = ""
+  newBillContainer = null
+}
+
 function fillForm(){
   userEvent.type(screen.getByTestId("expense-name"), "resto")
   userEvent.type(screen.getByTestId("amount"), "100")
@@ -68,7 +73,8 @@ window.localStorage.setItem('user', JSON.stringify({
 describe("Given that I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
-    beforeAll(() => InitNewBillviaOnNavigate())
+    beforeEach(() => InitNewBillviaOnNavigate())
+    afterEach(() => resetTestEnv())
 
     // * UNIT TEST : the form and the named input should be present on the newbill page
     // * UI : employee newBill page 
@@ -103,6 +109,7 @@ describe("Given that I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
     beforeEach(()=>{ InitWithANewBillInstance() })
+    afterEach(() => resetTestEnv())
 
     // * UNIT TEST : An invalid file shouldn't be added to the form or trigger a new bill creation call to the server
     // * UI : employee newBill page 
@@ -195,6 +202,13 @@ describe("Given that I am connected as an employee", () => {
 
     beforeAll(()=>{ 
       console.error = jest.fn(() => {})
+      mockStore.bills = jest.fn(mockStore.bills)
+    })
+
+    afterEach(() => {
+      resetTestEnv()
+      console.error.mockClear()
+      // mockStore.bills.mockClear()
     })
 
     // TEST 1 : Create a new Bill
@@ -256,7 +270,7 @@ describe("Given that I am connected as an employee", () => {
 
     // TEST 3 : Returning a 500 Error (Internal Server Error)
     test("Then after a failed API request returning a 500 error, a dedicated message should appears into the console", async () => {
-      mockStore.bills = jest.fn(mockStore.bills)
+      // mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {
           create : () =>  {
@@ -264,7 +278,7 @@ describe("Given that I am connected as an employee", () => {
           }
         }
       })
-      InitNewBillviaOnNavigate()
+      InitWithANewBillInstance()
       const fileInput = screen.getByTestId('file')
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
       fileInput.addEventListener('change', changeFileMockedFn)
@@ -276,14 +290,14 @@ describe("Given that I am connected as an employee", () => {
 
     // TEST 4 : Returning a 400 Error (Bad Request)
     test("Then after a failed API request returning a 400 error, a dedicated message should appears into the console", async () => {
-      mockStore.bills = jest.fn(mockStore.bills)
+      // mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {
           create : () =>  {
             return Promise.reject(new Error("Erreur 400"))
           }
       }})
-      InitNewBillviaOnNavigate()
+      InitWithANewBillInstance()
       const fileInput = screen.getByTestId('file')
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
       fileInput.addEventListener('change', changeFileMockedFn)
@@ -295,14 +309,14 @@ describe("Given that I am connected as an employee", () => {
 
     // TEST 5 : Returning a 401 Error (Unauthorized)
     test("Then after a failed API request returning a 401 error, a dedicated message should appears into the console", async () => {
-      mockStore.bills = jest.fn(mockStore.bills)
+      // mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {
           create : () =>  {
             return Promise.reject(new Error("Erreur 401"))
           }
       }})
-      InitNewBillviaOnNavigate()
+      InitWithANewBillInstance()
       const fileInput = screen.getByTestId('file')
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
       fileInput.addEventListener('change', changeFileMockedFn)
@@ -314,14 +328,14 @@ describe("Given that I am connected as an employee", () => {
 
     // TEST 6 : Returning a 403 Error (Forbidden)
     test("Then after a failed API request returning a 403 error, a dedicated message should appears into the console", async () => {
-      mockStore.bills = jest.fn(mockStore.bills)
+      // mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {
           create : () =>  {
             return Promise.reject(new Error("Erreur 403"))
           }
       }})
-      InitNewBillviaOnNavigate()
+      InitWithANewBillInstance()
       const fileInput = screen.getByTestId('file')
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
       fileInput.addEventListener('change', changeFileMockedFn)
@@ -333,14 +347,14 @@ describe("Given that I am connected as an employee", () => {
 
     // TEST 6 : Returning a 404 Error (Forbidden)
     test("Then after a failed API request returning a 404 error, a dedicated message should appears into the console", async () => {
-      mockStore.bills = jest.fn(mockStore.bills)
+      // mockStore.bills = jest.fn(mockStore.bills)
       mockStore.bills.mockImplementationOnce(() => {
         return {
           create : () =>  {
             return Promise.reject(new Error("Erreur 404"))
           }
       }})
-      InitNewBillviaOnNavigate()
+      InitWithANewBillInstance()
       const fileInput = screen.getByTestId('file')
       const changeFileMockedFn = jest.fn(newBillContainer.handleChangeFile)
       fileInput.addEventListener('change', changeFileMockedFn)
