@@ -43,9 +43,15 @@ function InitWithABillInstance() {
   billContainer = new Bills({ document, onNavigate : jest.fn, store: null, localStorage: window.localStorage })
 }
 
+function resetTestEnv(){
+  document.body.innerHTML = ""
+  billContainer = null
+}
+
 
 describe("Given that I am connected as an employee", () => {
   describe("When I am on the Bills Page", () => {
+
     test("Then the window icon in the vertical nav bar should be the only one highlighted", async () => {
         InitBillviaOnNavigate()
         await waitFor(() => screen.getByTestId('icon-window'))
@@ -95,6 +101,7 @@ describe("Given that I am connected as an employee", () => {
         expect(screen.getByTestId("form-new-bill")).toBeInTheDocument()
     })
 
+    resetTestEnv()
 
     // * UNIT TEST : clicking the "icon eye" button 
     // * UI : employee bills page
@@ -178,6 +185,11 @@ jest.mock("../app/Store", () => mockStore)
 
 describe("Given that I am connected as an employee", () => {
   describe("When I am on the Bills Page", () => {
+
+    afterEach(()=> {
+      resetTestEnv()
+    })
+
     test("Then a succesfull fetch should lead to 4 specific bills being displayed", async () => {
       InitBillviaOnNavigate()
       await waitFor(() => screen.getAllByTestId('icon-eye'))
