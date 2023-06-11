@@ -104,6 +104,7 @@ function convertDateToEn(date){
   convertedDate = convertedDate.replace('Fév.', 'Feb.')
   convertedDate = convertedDate.replace('Avr.', 'Apr.')
   convertedDate = convertedDate.replace('Mai.', 'May.')
+  convertedDate = convertedDate.replace('Jui.', 'Jul.')
   convertedDate = convertedDate.replace('Aoû.', 'Aug.')
   convertedDate = convertedDate.replace('Déc.', 'Dec.')
   return convertedDate
@@ -114,6 +115,7 @@ function convertDateToFr(date){
   convertedDate = convertedDate.replace('Feb.', 'Fév.')
   convertedDate = convertedDate.replace('Apr.', 'Avr.')
   convertedDate = convertedDate.replace('May.', 'Mai.')
+  convertedDate = convertedDate.replace('Jul.', 'Jui.')
   convertedDate = convertedDate.replace('Aug.', 'Aoû.')
   convertedDate = convertedDate.replace('Dec.', 'Déc.')
   return convertedDate
