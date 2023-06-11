@@ -84,9 +84,31 @@ export default ({ data: bills, loading, error }) => {
 function dateDescSorting(bills){
 
   if (bills && bills.length) { // to avoid test failure when one of the test send an empty array as bills
-    const billsClone = [...bills]    
+    /*const billsClone = [...bills]
+    billsClone.forEach(bill => {
+      //bill.date.replace('Fév', 'Feb')
+      console.log(bill.date)
+      console.log(Date.parse(bill.date))
+    })*/
+    console.log(bills)
+    const billsClone = [...bills].map(bill => {
+      bill.date = bill.date.replace('Fév.', 'Feb.')
+      bill.date = bill.date.replace('Avr.', 'Apr.')
+      bill.date = bill.date.replace('Mai.', 'May.')
+      bill.date = bill.date.replace('Aoû.', 'Aug.')
+      bill.date = bill.date.replace('Déc.', 'Dec.')
+      return bill
+    })
     billsClone.sort((a, b) => { return new Date(b.date) - new Date(a.date); })
-    return billsClone
+    // billsClone.sort((a, b) => ((a.date < b.date) ? 1 : (a.date > b.date) ? -1 : 0))
+    return [...billsClone].map(bill => {
+      bill.date = bill.date.replace('Feb.', 'Fév.')
+      bill.date = bill.date.replace('Apr.', 'Avr.')
+      bill.date = bill.date.replace('May.', 'Mai.')
+      bill.date = bill.date.replace('Aug.', 'Aoû.')
+      bill.date = bill.date.replace('Dec.', 'Déc.')
+      return bill
+    })
   }
 
   return bills
